@@ -83,6 +83,7 @@ jobs:
           errors = []
           for decoder in (
               lambda s: base64.b64decode(s, validate=False),
+              lambda s: base64.b64decode(s + "=" * (-len(s) % 4), validate=False),
               lambda s: base64.urlsafe_b64decode(s + "=" * (-len(s) % 4)),
           ):
               try:
