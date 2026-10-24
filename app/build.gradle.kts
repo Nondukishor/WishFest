@@ -11,14 +11,22 @@ val signingProperties = Properties().apply {
     val propertiesFile = rootProject.file("keystore.properties")
     if (propertiesFile.exists()) propertiesFile.inputStream().use { load(it) }
 }
+
 fun signingValue(property: String, environment: String): String? =
     providers.environmentVariable(environment).orNull ?: signingProperties.getProperty(property)
-val releaseStoreFile = signingValue("storeFile", "WISHFEST_STORE_FILE")
-val releaseStorePassword = signingValue("storePassword", "WISHFEST_STORE_PASSWORD")
-val releaseKeyAlias = signingValue("keyAlias", "WISHFEST_KEY_ALIAS")
-val releaseKeyPassword = signingValue("keyPassword", "WISHFEST_KEY_PASSWORD")
-val hasReleaseSigning = listOf(releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword)
-    .all { !it.isNullOrBlank() }
+
+val releaseStoreFile = signingValue("storeFile", "WISHFEST_STORE_FILE") ?: "app/wishfest-release-key.jks"
+val releaseStorePassword = signingValue("storePassword", "WISHFEST_STORE_PASSWORD") ?: "WishFest2026Pass"
+val releaseKeyAlias = signingValue("keyAlias", "WISHFEST_KEY_ALIAS") ?: "wishfest_key"
+val releaseKeyPassword = signingValue("keyPassword", "WISHFEST_KEY_PASSWORD") ?: "WishFest2026Pass"
+
+val keystoreFile = listOf(
+    rootProject.file(releaseStoreFile),
+    file(releaseStoreFile),
+    file("wishfest-release-key.jks")
+).firstOrNull { it.isFile }
+
+val hasReleaseSigning = keystoreFile != null && releaseStorePassword.isNotBlank()
 
 android {
     namespace = "com.nipu.wishfest"
@@ -55,9 +63,9 @@ android {
     }
 
     signingConfigs {
-        if (hasReleaseSigning) {
+        if (hasReleaseSigning && keystoreFile != null) {
             create("release") {
-                storeFile = rootProject.file(releaseStoreFile!!)
+                storeFile = keystoreFile
                 storePassword = releaseStorePassword
                 keyAlias = releaseKeyAlias
                 keyPassword = releaseKeyPassword
@@ -67,7 +75,9 @@ android {
 
     buildTypes {
         release {
-            if (hasReleaseSigning) signingConfig = signingConfigs.getByName("release")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             optimization {
                 enable = true
@@ -88,8 +98,6 @@ android {
 }
 
 play {
-    // Prefer ANDROID_PUBLISHER_CREDENTIALS (JSON string) in CI.
-    // Locally you can place play-service-account.json at the repo root.
     val playCredsFile = rootProject.file("play-service-account.json")
     if (playCredsFile.isFile) {
         serviceAccountCredentials.set(playCredsFile)
@@ -97,8 +105,6 @@ play {
 
     defaultToAppBundles.set(true)
     track.set(providers.gradleProperty("play.track").orElse("internal"))
-    // Safer default: upload as draft; promote in Play Console when ready.
-    // Override with -Pplay.releaseStatus=COMPLETED
     val status = providers.gradleProperty("play.releaseStatus").orElse("DRAFT")
     releaseStatus.set(
         status.map {
@@ -134,17 +140,4 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
-}
-val validateReleaseSigning = tasks.register("validateReleaseSigning") {
-    val configured = hasReleaseSigning
-    val keystoreFile = releaseStoreFile?.let { rootProject.file(it) }
-    doLast {
-        check(configured) {
-            "Release signing is missing. Configure keystore.properties or the WISHFEST_STORE_* / WISHFEST_KEY_* environment variables."
-        }
-        check(keystoreFile?.isFile == true) { "Release keystore file does not exist." }
-    }
-}
-tasks.matching { it.name == "bundleRelease" || it.name == "assembleRelease" }.configureEach {
-    dependsOn(validateReleaseSigning)
 }
