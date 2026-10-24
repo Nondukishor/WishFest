@@ -35,7 +35,7 @@ concurrency:
 jobs:
   publish:
     name: Build & upload AAB
-    # Secrets come from GitHub Environment "dev"
+    # Use Environment "dev" secrets (same place you configured them).
     environment: dev
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -62,51 +62,88 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "::error::Missing KEYSTORE_BASE64 in GitHub Environment 'dev'"
-            exit 1
-          fi
-
+          set -euo pipefail
           OUT="$GITHUB_WORKSPACE/wishfest-release-key.jks"
-          B64_ERR="$(mktemp "$RUNNER_TEMP/b64.XXXXXX.err")"
-          trap 'rm -f "$B64_ERR"' EXIT
-          # Strip whitespace/newlines that often break pasted secrets
-          CLEAN="$(printf '%s' "$KEYSTORE_BASE64" | tr -d ' \t\r\n')"
 
-          if ! printf '%s' "$CLEAN" | base64 --decode > "$OUT" 2>"$B64_ERR"; then
-            echo "::error::KEYSTORE_BASE64 is present but not valid base64."
-            echo "Recreate it with: base64 -i app/wishfest-release-key.jks | pbcopy"
-            echo "Then paste into Environment 'dev' → secret KEYSTORE_BASE64"
-            cat "$B64_ERR" || true
+          if [ -z "${KEYSTORE_BASE64:-}" ]; then
+            echo "::error::Missing KEYSTORE_BASE64 in Environment 'dev'."
+            echo "Create it with: base64 -i app/wishfest-release-key.jks | pbcopy"
             exit 1
           fi
 
-          if [ ! -s "$OUT" ]; then
-            echo "::error::Decoded keystore file is empty. KEYSTORE_BASE64 is wrong."
-            exit 1
-          fi
+          # Python decode is more tolerant than coreutils base64 (whitespace, padding).
+          python3 - <<'PY'
+          import base64, binascii, os, sys
 
-          echo "Decoded keystore bytes=$(wc -c < "$OUT")"
+          raw = os.environ.get("KEYSTORE_BASE64", "")
+          cleaned = "".join(raw.split())
+          out = os.path.join(os.environ["GITHUB_WORKSPACE"], "wishfest-release-key.jks")
+
+          data = None
+          errors = []
+          for decoder in (
+              lambda s: base64.b64decode(s, validate=False),
+              lambda s: base64.urlsafe_b64decode(s + "=" * (-len(s) % 4)),
+          ):
+              try:
+                  data = decoder(cleaned)
+                  if data:
+                      break
+              except (binascii.Error, ValueError) as exc:
+                  errors.append(str(exc))
+
+          if not data:
+              print("::error::KEYSTORE_BASE64 could not be decoded as base64.", file=sys.stderr)
+              print(f"secret_length={len(raw)} cleaned_length={len(cleaned)}", file=sys.stderr)
+              for err in errors:
+                  print(err, file=sys.stderr)
+              print("Recreate secret with: base64 -i app/wishfest-release-key.jks | pbcopy", file=sys.stderr)
+              sys.exit(1)
+
+          with open(out, "wb") as f:
+              f.write(data)
+          print(f"Decoded keystore bytes={len(data)}")
+          PY
+
           echo "WISHFEST_STORE_FILE=$OUT" >> "$GITHUB_ENV"
 
-      - name: Resolve Play track
+      - name: Resolve Play track & version
         id: meta
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "track=${{ inputs.track }}" >> "$GITHUB_OUTPUT"
             echo "status=${{ inputs.release_status }}" >> "$GITHUB_OUTPUT"
           else
-            # Push to main: publish directly to production and complete the release
             echo "track=production" >> "$GITHUB_OUTPUT"
             echo "status=COMPLETED" >> "$GITHUB_OUTPUT"
           fi
-          # Unique Play versionCode per CI run (must always increase)
-          echo "version_code=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          # Keep versionCode above previously published codes (base 100 + run_number)
+          echo "version_code=$((100 + ${{ github.run_number }}))" >> "$GITHUB_OUTPUT"
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             echo "version_name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
           else
             echo "version_name=1.0.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Build signed release AAB
+        env:
+          WISHFEST_STORE_PASSWORD: ${{ secrets.WISHFEST_STORE_PASSWORD }}
+          WISHFEST_KEY_ALIAS: ${{ secrets.WISHFEST_KEY_ALIAS }}
+          WISHFEST_KEY_PASSWORD: ${{ secrets.WISHFEST_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in WISHFEST_STORE_PASSWORD WISHFEST_KEY_ALIAS WISHFEST_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing secret $name in Environment 'dev'"
+              exit 1
+            fi
+          done
+          chmod +x ./gradlew
+          ./gradlew :app:bundleRelease \
+            --no-configuration-cache \
+            --stacktrace \
+            -Pwishfest.versionCode="${{ steps.meta.outputs.version_code }}" \
+            -Pwishfest.versionName="${{ steps.meta.outputs.version_name }}"
 
       - name: Publish AAB to Google Play Console
         env:
@@ -115,21 +152,11 @@ jobs:
           WISHFEST_KEY_PASSWORD: ${{ secrets.WISHFEST_KEY_PASSWORD }}
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.ANDROID_PUBLISHER_CREDENTIALS }}
         run: |
-          missing=0
-          for name in WISHFEST_STORE_PASSWORD WISHFEST_KEY_ALIAS WISHFEST_KEY_PASSWORD ANDROID_PUBLISHER_CREDENTIALS; do
-            if [ -z "${!name}" ]; then
-              echo "::error::Missing secret $name in GitHub Environment 'dev'"
-              missing=1
-            fi
-          done
-          if [ "$missing" -ne 0 ]; then
+          set -euo pipefail
+          if [ -z "${ANDROID_PUBLISHER_CREDENTIALS:-}" ]; then
+            echo "::error::Missing ANDROID_PUBLISHER_CREDENTIALS in Environment 'dev'"
             exit 1
           fi
-
-          chmod +x ./gradlew
-          echo "Publishing versionCode=${{ steps.meta.outputs.version_code }} versionName=${{ steps.meta.outputs.version_name }}"
-          echo "Play track=${{ steps.meta.outputs.track }} status=${{ steps.meta.outputs.status }}"
-
           ./gradlew :app:publishReleaseBundle \
             --no-configuration-cache \
             --stacktrace \

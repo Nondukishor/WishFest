@@ -23,3 +23,4 @@ local.properties
 /play-service-account.json
 **/google-play-credentials.json
 **/play-api-key.json
+keystore.b64
