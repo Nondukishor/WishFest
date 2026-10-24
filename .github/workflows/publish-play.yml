@@ -68,14 +68,16 @@ jobs:
           fi
 
           OUT="$GITHUB_WORKSPACE/wishfest-release-key.jks"
+          B64_ERR="$(mktemp "$RUNNER_TEMP/b64.XXXXXX.err")"
+          trap 'rm -f "$B64_ERR"' EXIT
           # Strip whitespace/newlines that often break pasted secrets
           CLEAN="$(printf '%s' "$KEYSTORE_BASE64" | tr -d ' \t\r\n')"
 
-          if ! printf '%s' "$CLEAN" | base64 --decode > "$OUT" 2>/tmp/b64.err; then
+          if ! printf '%s' "$CLEAN" | base64 --decode > "$OUT" 2>"$B64_ERR"; then
             echo "::error::KEYSTORE_BASE64 is present but not valid base64."
             echo "Recreate it with: base64 -i app/wishfest-release-key.jks | pbcopy"
             echo "Then paste into Environment 'dev' → secret KEYSTORE_BASE64"
-            cat /tmp/b64.err || true
+            cat "$B64_ERR" || true
             exit 1
           fi
 
