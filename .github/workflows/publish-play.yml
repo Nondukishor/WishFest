@@ -32,6 +32,8 @@ concurrency:
 jobs:
   publish:
     name: Build & upload AAB
+    # Secrets live in the GitHub Environment named "dev".
+    environment: dev
     # Pin runner OS so Ubuntu 26 migration does not surprise Android/NDK builds.
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -93,7 +95,7 @@ jobs:
 
       - name: Upload local AAB artifact
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: wishfest-release-aab
           path: app/build/outputs/bundle/release/*.aab

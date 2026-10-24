@@ -70,7 +70,9 @@ Workflow: `.github/workflows/publish-play.yml`
 | `WISHFEST_KEY_PASSWORD` | key password |
 | `ANDROID_PUBLISHER_CREDENTIALS` | full contents of the Play service-account JSON |
 
-Add secrets under: GitHub repo → **Settings → Secrets and variables → Actions**.
+Add secrets under: GitHub repo → **Settings → Environments → `dev` → Environment secrets**.
+
+The workflow job uses `environment: dev`, so repository-level secrets alone are not enough.
 
 ### Encode keystore (macOS)
 
