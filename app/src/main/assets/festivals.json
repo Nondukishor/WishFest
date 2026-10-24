@@ -1,0 +1,2389 @@
+{
+  "festivals": [
+    {
+      "id": "wedding-invitations",
+      "name": "Wedding Invitations",
+      "tagline": "Invite your guests · Names, date, venue & RSVP",
+      "category": "Wedding",
+      "icon": "💍",
+      "templates": [
+        {
+          "id": "wedding-royal-mandala",
+          "title": "Royal Crimson Gold Wedding",
+          "backgroundColor": "#4A0E17",
+          "borderStyle": "mandala_arch",
+          "borderColor": "#FFD700",
+          "layers": [
+            {
+              "id": "wedding-heading",
+              "type": "text",
+              "text": "THE WEDDING OF",
+              "fontId": "serif",
+              "fontSize": 28,
+              "color": "#E5A93C",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 200.0,
+                "width": 780.0,
+                "height": 65.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-names-gold",
+              "type": "text",
+              "text": "Anika & Pranav",
+              "fontId": "cursive",
+              "fontSize": 82,
+              "color": "#FFD700",
+              "alignment": "center",
+              "transform": {
+                "x": 100.0,
+                "y": 300.0,
+                "width": 880.0,
+                "height": 160.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-invite-msg",
+              "type": "text",
+              "text": "WE INVITE YOU TO JOIN OUR CELEBRATION",
+              "fontId": "serif",
+              "fontSize": 26,
+              "color": "#FFF8DC",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 510.0,
+                "width": 780.0,
+                "height": 65.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-date-gold",
+              "type": "text",
+              "text": "24 . 02 . 2026",
+              "fontId": "bold",
+              "fontSize": 64,
+              "color": "#FFD700",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 600.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-venue-gold",
+              "type": "text",
+              "text": "SATURDAY AT 6 PM\nEVENING HOTEL, SINGAPORE",
+              "fontId": "serif",
+              "fontSize": 28,
+              "color": "#FFF8DC",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 720.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "id": "wedding-royal-crest",
+          "title": "Royal Gold Mandala Crest",
+          "backgroundColor": "#5C061C",
+          "borderStyle": "royal_crest",
+          "borderColor": "#FFDF00",
+          "layers": [
+            {
+              "id": "royal-crest-heading",
+              "type": "text",
+              "text": "ROYAL CELEBRATION",
+              "fontId": "serif",
+              "fontSize": 32,
+              "color": "#FFDF00",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 380.0,
+                "width": 780.0,
+                "height": 70.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "royal-crest-names",
+              "type": "text",
+              "text": "Together in Harmony",
+              "fontId": "cursive",
+              "fontSize": 72,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {
+                "x": 100.0,
+                "y": 480.0,
+                "width": 880.0,
+                "height": 150.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "royal-crest-wish",
+              "type": "text",
+              "text": "May your home be blessed with everlasting love, joy, and prosperous moments.",
+              "fontId": "serif",
+              "fontSize": 32,
+              "color": "#FFF8DC",
+              "alignment": "center",
+              "transform": {
+                "x": 120.0,
+                "y": 660.0,
+                "width": 840.0,
+                "height": 180.0,
+                "rotation": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "id": "wedding-arch",
+          "title": "Blush Floral Wedding",
+          "backgroundColor": "#FFF4F2",
+          "borderStyle": "wedding_arch",
+          "borderColor": "#B77583",
+          "layers": [
+            {
+              "id": "wedding-invitation",
+              "type": "text",
+              "text": "YOU ARE CORDIALLY INVITED",
+              "fontId": "default",
+              "fontSize": 29,
+              "color": "#71374B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 235.0,
+                "width": 780.0,
+                "height": 75.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-names",
+              "type": "text",
+              "text": "Name & Name",
+              "fontId": "serif",
+              "fontSize": 68,
+              "color": "#71374B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 335.0,
+                "width": 780.0,
+                "height": 130.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-message",
+              "type": "text",
+              "text": "Together with our families,\nwe invite you to celebrate our wedding.",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#71374B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 490.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-date",
+              "type": "text",
+              "text": "Wedding date · Time",
+              "fontId": "default",
+              "fontSize": 32,
+              "color": "#71374B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 625.0,
+                "width": 780.0,
+                "height": 65.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-venue",
+              "type": "text",
+              "text": "Venue name\nCity / address",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#71374B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 720.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-rsvp",
+              "type": "text",
+              "text": "Kindly RSVP: your contact",
+              "fontId": "default",
+              "fontSize": 24,
+              "color": "#71374B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 860.0,
+                "width": 780.0,
+                "height": 55.0,
+                "rotation": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "id": "wedding-garland",
+          "title": "Marigold Wedding Invitation",
+          "backgroundColor": "#FFFBEB",
+          "borderStyle": "wedding_garland",
+          "borderColor": "#B7791F",
+          "layers": [
+            {
+              "id": "wedding-invitation",
+              "type": "text",
+              "text": "YOU ARE CORDIALLY INVITED",
+              "fontId": "default",
+              "fontSize": 29,
+              "color": "#713F12",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 235.0,
+                "width": 780.0,
+                "height": 75.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-names",
+              "type": "text",
+              "text": "Name & Name",
+              "fontId": "serif",
+              "fontSize": 68,
+              "color": "#713F12",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 335.0,
+                "width": 780.0,
+                "height": 130.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-message",
+              "type": "text",
+              "text": "Together with our families,\nwe invite you to celebrate our wedding.",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#713F12",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 490.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-date",
+              "type": "text",
+              "text": "Wedding date · Time",
+              "fontId": "default",
+              "fontSize": 32,
+              "color": "#713F12",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 625.0,
+                "width": 780.0,
+                "height": 65.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-venue",
+              "type": "text",
+              "text": "Venue name\nCity / address",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#713F12",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 720.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-rsvp",
+              "type": "text",
+              "text": "Kindly RSVP: your contact",
+              "fontId": "default",
+              "fontSize": 24,
+              "color": "#713F12",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 860.0,
+                "width": 780.0,
+                "height": 55.0,
+                "rotation": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "id": "wedding-mandap",
+          "title": "Royal Mandap Invitation",
+          "backgroundColor": "#581C30",
+          "borderStyle": "wedding_mandap",
+          "borderColor": "#E5BF79",
+          "layers": [
+            {
+              "id": "wedding-invitation",
+              "type": "text",
+              "text": "YOU ARE CORDIALLY INVITED",
+              "fontId": "default",
+              "fontSize": 29,
+              "color": "#FFF1D6",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 235.0,
+                "width": 780.0,
+                "height": 75.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-names",
+              "type": "text",
+              "text": "Name & Name",
+              "fontId": "serif",
+              "fontSize": 68,
+              "color": "#FFF1D6",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 335.0,
+                "width": 780.0,
+                "height": 130.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-message",
+              "type": "text",
+              "text": "Together with our families,\nwe invite you to celebrate our wedding.",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#FFF1D6",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 490.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-date",
+              "type": "text",
+              "text": "Wedding date · Time",
+              "fontId": "default",
+              "fontSize": 32,
+              "color": "#FFF1D6",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 625.0,
+                "width": 780.0,
+                "height": 65.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-venue",
+              "type": "text",
+              "text": "Venue name\nCity / address",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#FFF1D6",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 720.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-rsvp",
+              "type": "text",
+              "text": "Kindly RSVP: your contact",
+              "fontId": "default",
+              "fontSize": 24,
+              "color": "#FFF1D6",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 860.0,
+                "width": 780.0,
+                "height": 55.0,
+                "rotation": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "id": "wedding-rings",
+          "title": "Together Forever Wedding",
+          "backgroundColor": "#FFFDF5",
+          "borderStyle": "wedding_rings",
+          "borderColor": "#B08D57",
+          "layers": [
+            {
+              "id": "wedding-invitation",
+              "type": "text",
+              "text": "YOU ARE CORDIALLY INVITED",
+              "fontId": "default",
+              "fontSize": 29,
+              "color": "#51433B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 235.0,
+                "width": 780.0,
+                "height": 75.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-names",
+              "type": "text",
+              "text": "Name & Name",
+              "fontId": "serif",
+              "fontSize": 68,
+              "color": "#51433B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 335.0,
+                "width": 780.0,
+                "height": 130.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-message",
+              "type": "text",
+              "text": "Together with our families,\nwe invite you to celebrate our wedding.",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#51433B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 490.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-date",
+              "type": "text",
+              "text": "Wedding date · Time",
+              "fontId": "default",
+              "fontSize": 32,
+              "color": "#51433B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 625.0,
+                "width": 780.0,
+                "height": 65.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-venue",
+              "type": "text",
+              "text": "Venue name\nCity / address",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#51433B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 720.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-rsvp",
+              "type": "text",
+              "text": "Kindly RSVP: your contact",
+              "fontId": "default",
+              "fontSize": 24,
+              "color": "#51433B",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 860.0,
+                "width": 780.0,
+                "height": 55.0,
+                "rotation": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "id": "wedding-lace",
+          "title": "Pearl Lace Wedding",
+          "backgroundColor": "#FAF5FF",
+          "borderStyle": "wedding_lace",
+          "borderColor": "#9F7A9C",
+          "layers": [
+            {
+              "id": "wedding-invitation",
+              "type": "text",
+              "text": "YOU ARE CORDIALLY INVITED",
+              "fontId": "default",
+              "fontSize": 29,
+              "color": "#684266",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 235.0,
+                "width": 780.0,
+                "height": 75.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-names",
+              "type": "text",
+              "text": "Name & Name",
+              "fontId": "serif",
+              "fontSize": 68,
+              "color": "#684266",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 335.0,
+                "width": 780.0,
+                "height": 130.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-message",
+              "type": "text",
+              "text": "Together with our families,\nwe invite you to celebrate our wedding.",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#684266",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 490.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-date",
+              "type": "text",
+              "text": "Wedding date · Time",
+              "fontId": "default",
+              "fontSize": 32,
+              "color": "#684266",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 625.0,
+                "width": 780.0,
+                "height": 65.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-venue",
+              "type": "text",
+              "text": "Venue name\nCity / address",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#684266",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 720.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-rsvp",
+              "type": "text",
+              "text": "Kindly RSVP: your contact",
+              "fontId": "default",
+              "fontSize": 24,
+              "color": "#684266",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 860.0,
+                "width": 780.0,
+                "height": 55.0,
+                "rotation": 0.0
+              }
+            }
+          ]
+        },
+        {
+          "id": "wedding-botanical",
+          "title": "Sage Garden Wedding",
+          "backgroundColor": "#F3F6EF",
+          "borderStyle": "wedding_botanical",
+          "borderColor": "#637E62",
+          "layers": [
+            {
+              "id": "wedding-invitation",
+              "type": "text",
+              "text": "YOU ARE CORDIALLY INVITED",
+              "fontId": "default",
+              "fontSize": 29,
+              "color": "#344D39",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 235.0,
+                "width": 780.0,
+                "height": 75.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-names",
+              "type": "text",
+              "text": "Name & Name",
+              "fontId": "serif",
+              "fontSize": 68,
+              "color": "#344D39",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 335.0,
+                "width": 780.0,
+                "height": 130.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-message",
+              "type": "text",
+              "text": "Together with our families,\nwe invite you to celebrate our wedding.",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#344D39",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 490.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-date",
+              "type": "text",
+              "text": "Wedding date · Time",
+              "fontId": "default",
+              "fontSize": 32,
+              "color": "#344D39",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 625.0,
+                "width": 780.0,
+                "height": 65.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-venue",
+              "type": "text",
+              "text": "Venue name\nCity / address",
+              "fontId": "serif",
+              "fontSize": 30,
+              "color": "#344D39",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 720.0,
+                "width": 780.0,
+                "height": 100.0,
+                "rotation": 0.0
+              }
+            },
+            {
+              "id": "wedding-rsvp",
+              "type": "text",
+              "text": "Kindly RSVP: your contact",
+              "fontId": "default",
+              "fontSize": 24,
+              "color": "#344D39",
+              "alignment": "center",
+              "transform": {
+                "x": 150.0,
+                "y": 860.0,
+                "width": 780.0,
+                "height": 55.0,
+                "rotation": 0.0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "start-sunday",
+      "name": "Start Sunday",
+      "tagline": "Blessed Mornings & Peaceful Wishes",
+      "category": "Sunday",
+      "icon": "🌿",
+      "templates": [
+        {
+          "id": "sunday-01",
+          "title": "Blessed Sunday Morning",
+          "backgroundColor": "#FFFDF8",
+          "borderStyle": "floral",
+          "borderColor": "#52796F",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "WISHING YOU A BLESSED",
+              "fontId": "serif",
+              "fontSize": 32.0,
+              "color": "#4A5D4E",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 260.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "SUNDAY",
+              "fontId": "bold",
+              "fontSize": 84.0,
+              "color": "#1B4332",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 350.0, "width": 880.0, "height": 180.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "— 🌿 ✦ 🌿 —",
+              "fontId": "default",
+              "fontSize": 36.0,
+              "color": "#52796F",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 520.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t4",
+              "type": "text",
+              "text": "May your Sunday be filled with quiet moments, peace, and joyous blessings for the week ahead.",
+              "fontId": "serif",
+              "fontSize": 34.0,
+              "color": "#2F3E46",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 620.0, "width": 840.0, "height": 220.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "sunday-02",
+          "title": "Happy Sunday Grace",
+          "backgroundColor": "#F4F7F4",
+          "borderStyle": "scallop",
+          "borderColor": "#6B826C",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "FRESH SUNDAY MORNING",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#52796F",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 280.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY SUNDAY",
+              "fontId": "headline",
+              "fontSize": 76.0,
+              "color": "#1B4332",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 370.0, "width": 880.0, "height": 160.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "Start this Sunday with a grateful heart and a peaceful mind.",
+              "fontId": "cursive",
+              "fontSize": 38.0,
+              "color": "#354F52",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 580.0, "width": 840.0, "height": 200.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "sunday-03",
+          "title": "Sunday Joy & Peace",
+          "backgroundColor": "gradient:#FFF7ED,#FDE68A",
+          "borderStyle": "double",
+          "borderColor": "#A16207",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "MAY YOUR DAY BE BRIGHT",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#854D0E",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 320.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "SUNDAY BLESSINGS",
+              "fontId": "bold",
+              "fontSize": 68.0,
+              "color": "#713F12",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 420.0, "width": 880.0, "height": 160.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "new-year",
+      "name": "Happy New Year",
+      "tagline": "Cheers to New Beginnings & Joy",
+      "category": "New Year",
+      "icon": "🎉",
+      "templates": [
+        {
+          "id": "ny-01",
+          "title": "Elegant Floral New Year 2026",
+          "backgroundColor": "#FFFDF8",
+          "borderStyle": "floral",
+          "borderColor": "#B76E79",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "WISHING YOU A HAPPY & PROSPEROUS",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#52796F",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 260.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "NEW YEAR 2026",
+              "fontId": "bold",
+              "fontSize": 76.0,
+              "color": "#1B4332",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 350.0, "width": 880.0, "height": 180.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "— ✨ ✦ ✨ —",
+              "fontId": "default",
+              "fontSize": 36.0,
+              "color": "#E5A93C",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 530.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t4",
+              "type": "text",
+              "text": "May the coming year bring new hope, health, fresh horizons, and abundant joy to your home.",
+              "fontId": "serif",
+              "fontSize": 34.0,
+              "color": "#2F3E46",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 630.0, "width": 840.0, "height": 220.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "ny-02",
+          "title": "Subho Noboborsho Floral Elegance",
+          "backgroundColor": "#FFF8F0",
+          "borderStyle": "alpana",
+          "borderColor": "#C15D3B",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "শুভ নববর্ষ ১৪৩৩",
+              "fontId": "bengali",
+              "fontSize": 72.0,
+              "color": "#8B0000",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 320.0, "width": 900.0, "height": 180.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "— 🌺 ✦ 🌺 —",
+              "fontId": "default",
+              "fontSize": 34.0,
+              "color": "#E5A93C",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 510.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "নতুন বছরের প্রতিটি দিন কাটুক অনাবিল আনন্দ, স্বাস্থ্য ও সাফল্যে।",
+              "fontId": "bengali",
+              "fontSize": 38.0,
+              "color": "#4A0E17",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 600.0, "width": 880.0, "height": 200.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "ny-03",
+          "title": "Golden Midnight New Year",
+          "backgroundColor": "gradient:#0F172A,#D97706",
+          "borderStyle": "deco",
+          "borderColor": "#FDE68A",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "CELEBRATING NEW BEGINNINGS",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#FDE047",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 320.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY NEW YEAR",
+              "fontId": "bold",
+              "fontSize": 72.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 420.0, "width": 880.0, "height": 180.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "durga-puja",
+      "name": "Durga Puja",
+      "tagline": "Sharadotsav & Joyful Blessings",
+      "category": "Hindu",
+      "icon": "🌸",
+      "templates": [
+        {
+          "id": "durga-01",
+          "title": "Sharadiya Subho Bijoya",
+          "backgroundColor": "#8B0000",
+          "borderStyle": "toran",
+          "borderColor": "#F5C45E",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "শুভ শারদীয়া দুর্গোৎসব",
+              "fontId": "bengali",
+              "fontSize": 64.0,
+              "color": "#FFD700",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 300.0, "width": 900.0, "height": 180.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "May Maa Durga bless your home with health, peace & prosperity.",
+              "fontId": "default",
+              "fontSize": 38.0,
+              "color": "#FFF8DC",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 550.0, "width": 880.0, "height": 220.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "durga-02",
+          "title": "Subho Bijoya Elegant",
+          "backgroundColor": "#4A0E17",
+          "borderStyle": "shankha",
+          "borderColor": "#FDE6B5",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "শুভ বিজয়ার প্রীতি ও শুভেচ্ছা",
+              "fontId": "bengali",
+              "fontSize": 58.0,
+              "color": "#FFA500",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 350.0, "width": 900.0, "height": 200.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "durga-03",
+          "title": "Jai Maa Durga",
+          "backgroundColor": "gradient:#7F1D1D,#F59E0B",
+          "borderStyle": "temple",
+          "borderColor": "#FFF1CA",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "जय माता दुर्गा",
+              "fontId": "hindi",
+              "fontSize": 68.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 300.0, "width": 900.0, "height": 160.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "SHUBHO DURGA PUJA",
+              "fontId": "bold",
+              "fontSize": 42.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 500.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May strength, courage, and light fill every corner of your life.",
+              "fontId": "serif",
+              "fontSize": 32.0,
+              "color": "#FEF9C3",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 160.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kali-puja",
+      "name": "Kali Puja & Diwali",
+      "tagline": "Festival of Lights & Harmony",
+      "category": "Hindu",
+      "icon": "🪔",
+      "templates": [
+        {
+          "id": "kali-01",
+          "title": "Happy Diwali & Subho Deepavali",
+          "backgroundColor": "#2B1055",
+          "borderStyle": "diya",
+          "borderColor": "#FACC15",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "শুভ দীপাবলি ও কালীপূজা",
+              "fontId": "bengali",
+              "fontSize": 60.0,
+              "color": "#FFDF00",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 320.0, "width": 900.0, "height": 200.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "diwali-02",
+          "title": "Happy Diwali Glow",
+          "backgroundColor": "gradient:#1E1B4B,#F59E0B",
+          "borderStyle": "bells",
+          "borderColor": "#FFF1CA",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "शुभ दीपावली",
+              "fontId": "hindi",
+              "fontSize": 72.0,
+              "color": "#FDE68A",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 280.0, "width": 900.0, "height": 160.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY DIWALI",
+              "fontId": "bold",
+              "fontSize": 56.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 480.0, "width": 880.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May your home shine with love, light, and lasting prosperity.",
+              "fontId": "serif",
+              "fontSize": 32.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 160.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "diwali-03",
+          "title": "Festival of Lights",
+          "backgroundColor": "#0F172A",
+          "borderStyle": "rangoli",
+          "borderColor": "#E5A93C",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "🪔 FESTIVAL OF LIGHTS 🪔",
+              "fontId": "serif",
+              "fontSize": 28.0,
+              "color": "#FBBF24",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 300.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY DIWALI",
+              "fontId": "bold",
+              "fontSize": 68.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 420.0, "width": 880.0, "height": 160.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "Light a diya, share a smile, welcome a brighter year.",
+              "fontId": "default",
+              "fontSize": 30.0,
+              "color": "#E2E8F0",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holi",
+      "name": "Holi",
+      "tagline": "Colors, Joy & Fresh Beginnings",
+      "category": "Hindu",
+      "icon": "🎨",
+      "templates": [
+        {
+          "id": "holi-01",
+          "title": "Happy Holi Colors",
+          "backgroundColor": "gradient:#EC4899,#F59E0B,#8B5CF6",
+          "borderStyle": "confetti",
+          "borderColor": "#FFF4DB",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "हैप्पी होली",
+              "fontId": "hindi",
+              "fontSize": 70.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 300.0, "width": 900.0, "height": 160.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY HOLI",
+              "fontId": "bold",
+              "fontSize": 52.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 500.0, "width": 880.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May your life be painted with love, laughter, and bright colors.",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 660.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "holi-02",
+          "title": "Festival of Colors",
+          "backgroundColor": "#7C3AED",
+          "borderStyle": "rangoli",
+          "borderColor": "#FDE68A",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "FESTIVAL OF COLORS",
+              "fontId": "serif",
+              "fontSize": 28.0,
+              "color": "#FDE68A",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 320.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HOLI MUBARAK",
+              "fontId": "bold",
+              "fontSize": 64.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 430.0, "width": 880.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ganesh-chaturthi",
+      "name": "Ganesh Chaturthi",
+      "tagline": "Wisdom, Prosperity & New Starts",
+      "category": "Hindu",
+      "icon": "🐘",
+      "templates": [
+        {
+          "id": "ganesh-01",
+          "title": "Ganpati Bappa Morya",
+          "backgroundColor": "gradient:#7F1D1D,#FBBF24",
+          "borderStyle": "mango",
+          "borderColor": "#FFF1CA",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "गणपति बाप्पा मोरया",
+              "fontId": "hindi",
+              "fontSize": 58.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 280.0, "width": 900.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY GANESH CHATURTHI",
+              "fontId": "bold",
+              "fontSize": 40.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 460.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May Lord Ganesha remove every obstacle and bless your path.",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#FEF9C3",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 620.0, "width": 840.0, "height": 160.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "ganesh-02",
+          "title": "Vighnaharta Blessings",
+          "backgroundColor": "#1C1917",
+          "borderStyle": "temple",
+          "borderColor": "#E5A93C",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "ॐ गं गणपतये नमः",
+              "fontId": "hindi",
+              "fontSize": 48.0,
+              "color": "#FBBF24",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 340.0, "width": 900.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "Shubh Ganesh Chaturthi",
+              "fontId": "serif",
+              "fontSize": 36.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 520.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "raksha-bandhan",
+      "name": "Raksha Bandhan",
+      "tagline": "Bond of Love & Protection",
+      "category": "Hindu",
+      "icon": "🎀",
+      "templates": [
+        {
+          "id": "rakhi-01",
+          "title": "Happy Raksha Bandhan",
+          "backgroundColor": "gradient:#9F1239,#FBCFE8",
+          "borderStyle": "alpana",
+          "borderColor": "#FFF1CA",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "रक्षाबंधन की शुभकामनाएँ",
+              "fontId": "hindi",
+              "fontSize": 48.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 300.0, "width": 900.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY RAKSHA BANDHAN",
+              "fontId": "bold",
+              "fontSize": 40.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 480.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "A thread of love that protects forever.",
+              "fontId": "cursive",
+              "fontSize": 34.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 120.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eid-fitr",
+      "name": "Eid al-Fitr",
+      "tagline": "Peace, Blessing & Celebration",
+      "category": "Islamic",
+      "icon": "🌙",
+      "templates": [
+        {
+          "id": "eid-01",
+          "title": "Eid Mubarak Elegant Gold",
+          "backgroundColor": "#1A4331",
+          "borderStyle": "deco",
+          "borderColor": "#E5A93C",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "عيد مبارك",
+              "fontId": "arabic",
+              "fontSize": 84.0,
+              "color": "#E5A93C",
+              "alignment": "center",
+              "transform": {"x": 140.0, "y": 280.0, "width": 800.0, "height": 200.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "Eid Mubarak",
+              "fontId": "default",
+              "fontSize": 64.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 140.0, "y": 500.0, "width": 800.0, "height": 150.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "eid-02",
+          "title": "Eid Joy Crescent",
+          "backgroundColor": "gradient:#064E3B,#0F766E",
+          "borderStyle": "double",
+          "borderColor": "#FDE68A",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "🌙 EID MUBARAK 🌙",
+              "fontId": "bold",
+              "fontSize": 52.0,
+              "color": "#FDE68A",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 340.0, "width": 880.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "May Allah fill your home with peace, barakah, and endless joy.",
+              "fontId": "serif",
+              "fontSize": 32.0,
+              "color": "#ECFDF5",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 520.0, "width": 840.0, "height": 180.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "eid-03",
+          "title": "Taqabbalallahu",
+          "backgroundColor": "#0B1220",
+          "borderStyle": "scallop",
+          "borderColor": "#E5A93C",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "تقبل الله منا ومنكم",
+              "fontId": "arabic",
+              "fontSize": 48.0,
+              "color": "#FBBF24",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 300.0, "width": 880.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "Eid Mubarak",
+              "fontId": "bold",
+              "fontSize": 56.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 480.0, "width": 880.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May your prayers be accepted and your hearts be light.",
+              "fontId": "default",
+              "fontSize": 28.0,
+              "color": "#CBD5E1",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eid-adha",
+      "name": "Eid al-Adha",
+      "tagline": "Faith, Sacrifice & Generosity",
+      "category": "Islamic",
+      "icon": "🕌",
+      "templates": [
+        {
+          "id": "adha-01",
+          "title": "Eid al-Adha Mubarak",
+          "backgroundColor": "gradient:#14532D,#CA8A04",
+          "borderStyle": "deco",
+          "borderColor": "#FFF1CA",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "عيد الأضحى مبارك",
+              "fontId": "arabic",
+              "fontSize": 56.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 280.0, "width": 900.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "EID AL-ADHA MUBARAK",
+              "fontId": "bold",
+              "fontSize": 42.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 460.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May your sacrifice be accepted and your family be blessed.",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#FEF9C3",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 620.0, "width": 840.0, "height": 160.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "adha-02",
+          "title": "Bakrid Greetings",
+          "backgroundColor": "#1E293B",
+          "borderStyle": "double",
+          "borderColor": "#E5A93C",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "HAPPY BAKRID",
+              "fontId": "bold",
+              "fontSize": 60.0,
+              "color": "#FBBF24",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 360.0, "width": 880.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "Share, care, and celebrate with a generous heart.",
+              "fontId": "serif",
+              "fontSize": 32.0,
+              "color": "#E2E8F0",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 560.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ramadan",
+      "name": "Ramadan",
+      "tagline": "Reflection, Mercy & Community",
+      "category": "Islamic",
+      "icon": "⭐",
+      "templates": [
+        {
+          "id": "ramadan-01",
+          "title": "Ramadan Kareem",
+          "backgroundColor": "gradient:#0F172A,#1E3A5F",
+          "borderStyle": "deco",
+          "borderColor": "#E5A93C",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "رمضان كريم",
+              "fontId": "arabic",
+              "fontSize": 72.0,
+              "color": "#FBBF24",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 300.0, "width": 880.0, "height": 160.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "RAMADAN KAREEM",
+              "fontId": "bold",
+              "fontSize": 44.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 500.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May this holy month bring you peace, patience, and barakah.",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#CBD5E1",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "ramadan-02",
+          "title": "Ramadan Mubarak Night",
+          "backgroundColor": "#111827",
+          "borderStyle": "scallop",
+          "borderColor": "#FDE68A",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "⭐ RAMADAN MUBARAK 🌙",
+              "fontId": "serif",
+              "fontSize": 36.0,
+              "color": "#FDE68A",
+              "alignment": "center",
+              "transform": {"x": 80.0, "y": 380.0, "width": 920.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "A month of light, mercy, and renewed faith.",
+              "fontId": "default",
+              "fontSize": 30.0,
+              "color": "#E5E7EB",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 540.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "christmas",
+      "name": "Christmas",
+      "tagline": "Joy, Peace & Goodwill",
+      "category": "Christian",
+      "icon": "🎄",
+      "templates": [
+        {
+          "id": "xmas-01",
+          "title": "Merry Christmas Classic",
+          "backgroundColor": "gradient:#14532D,#7F1D1D",
+          "borderStyle": "ribbon",
+          "borderColor": "#FDE6B5",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "MERRY CHRISTMAS",
+              "fontId": "bold",
+              "fontSize": 64.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 80.0, "y": 320.0, "width": 920.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "May peace and joy fill your home this season.",
+              "fontId": "serif",
+              "fontSize": 32.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 520.0, "width": 840.0, "height": 160.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "xmas-02",
+          "title": "Silent Night Blessings",
+          "backgroundColor": "#0F172A",
+          "borderStyle": "confetti",
+          "borderColor": "#E8EDF5",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "✦ PEACE ON EARTH ✦",
+              "fontId": "serif",
+              "fontSize": 28.0,
+              "color": "#FBBF24",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 300.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "MERRY CHRISTMAS",
+              "fontId": "bold",
+              "fontSize": 56.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 420.0, "width": 880.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "Wishing you warmth, wonder, and a blessed holiday.",
+              "fontId": "cursive",
+              "fontSize": 34.0,
+              "color": "#E2E8F0",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 600.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "xmas-03",
+          "title": "Christmas Snow Glow",
+          "backgroundColor": "#FFF7ED",
+          "borderStyle": "dashed",
+          "borderColor": "#9F3541",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "JOY TO THE WORLD",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#9F1239",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 300.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "Merry Christmas",
+              "fontId": "cursive",
+              "fontSize": 64.0,
+              "color": "#14532D",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 420.0, "width": 880.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May your days be merry and bright.",
+              "fontId": "default",
+              "fontSize": 30.0,
+              "color": "#44403C",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 620.0, "width": 840.0, "height": 120.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "easter",
+      "name": "Easter",
+      "tagline": "Hope, Renewal & New Life",
+      "category": "Christian",
+      "icon": "🐣",
+      "templates": [
+        {
+          "id": "easter-01",
+          "title": "Happy Easter Soft",
+          "backgroundColor": "gradient:#FEF3C7,#BBF7D0",
+          "borderStyle": "floral",
+          "borderColor": "#52796F",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "HAPPY EASTER",
+              "fontId": "bold",
+              "fontSize": 64.0,
+              "color": "#166534",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 340.0, "width": 880.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "May this season bring hope, renewal, and gentle joy.",
+              "fontId": "serif",
+              "fontSize": 32.0,
+              "color": "#3F6212",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 540.0, "width": 840.0, "height": 160.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "easter-02",
+          "title": "He Is Risen",
+          "backgroundColor": "#FEFCE8",
+          "borderStyle": "scallop",
+          "borderColor": "#B7798D",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "HE IS RISEN",
+              "fontId": "serif",
+              "fontSize": 48.0,
+              "color": "#854D0E",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 320.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "Happy Easter",
+              "fontId": "cursive",
+              "fontSize": 56.0,
+              "color": "#9F1239",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 460.0, "width": 880.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "Blessings of light and new beginnings.",
+              "fontId": "default",
+              "fontSize": 28.0,
+              "color": "#57534E",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 120.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vaisakhi",
+      "name": "Vaisakhi",
+      "tagline": "Harvest, Faith & Community",
+      "category": "Sikh",
+      "icon": "🌾",
+      "templates": [
+        {
+          "id": "vaisakhi-01",
+          "title": "Happy Vaisakhi",
+          "backgroundColor": "gradient:#F97316,#FACC15",
+          "borderStyle": "floral",
+          "borderColor": "#713F12",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "ਵੈਸਾਖੀ ਦੀਆਂ ਲੱਖ ਲੱਖ ਵਧਾਈਆਂ",
+              "fontId": "default",
+              "fontSize": 40.0,
+              "color": "#7C2D12",
+              "alignment": "center",
+              "transform": {"x": 80.0, "y": 300.0, "width": 920.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY VAISAKHI",
+              "fontId": "bold",
+              "fontSize": 48.0,
+              "color": "#1C1917",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 480.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May Waheguru bless you with courage, kindness, and prosperity.",
+              "fontId": "serif",
+              "fontSize": 28.0,
+              "color": "#44403C",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "vaisakhi-02",
+          "title": "Khalsa Spirit",
+          "backgroundColor": "#1C1917",
+          "borderStyle": "deco",
+          "borderColor": "#F5C45E",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "ੴ Sat Sri Akal",
+              "fontId": "serif",
+              "fontSize": 42.0,
+              "color": "#FBBF24",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 340.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY VAISAKHI",
+              "fontId": "bold",
+              "fontSize": 48.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 480.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guru-nanak",
+      "name": "Guru Nanak Jayanti",
+      "tagline": "Light of Wisdom & Equality",
+      "category": "Sikh",
+      "icon": "🔆",
+      "templates": [
+        {
+          "id": "gurunanak-01",
+          "title": "Guru Nanak Jayanti",
+          "backgroundColor": "gradient:#1E3A8A,#F59E0B",
+          "borderStyle": "double",
+          "borderColor": "#FFF1CA",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "ਗੁਰੂ ਨਾਨਕ ਜਯੰਤੀ",
+              "fontId": "default",
+              "fontSize": 48.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 300.0, "width": 900.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "GURU NANAK JAYANTI",
+              "fontId": "bold",
+              "fontSize": 40.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 460.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May the Guru’s teachings guide you toward truth and compassion.",
+              "fontId": "serif",
+              "fontSize": 28.0,
+              "color": "#E0E7FF",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 620.0, "width": 840.0, "height": 160.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vesak",
+      "name": "Vesak / Buddha Purnima",
+      "tagline": "Compassion, Mindfulness & Peace",
+      "category": "Buddhist",
+      "icon": "🪷",
+      "templates": [
+        {
+          "id": "vesak-01",
+          "title": "Happy Vesak",
+          "backgroundColor": "gradient:#312E81,#FDE68A",
+          "borderStyle": "lotus",
+          "borderColor": "#FFF1CA",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "🪷 HAPPY VESAK 🪷",
+              "fontId": "bold",
+              "fontSize": 48.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 80.0, "y": 320.0, "width": 920.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "May loving-kindness and peace bloom in every heart.",
+              "fontId": "serif",
+              "fontSize": 32.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 500.0, "width": 840.0, "height": 180.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "vesak-02",
+          "title": "Buddha Purnima",
+          "backgroundColor": "#FFFBEB",
+          "borderStyle": "lotus",
+          "borderColor": "#A16207",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "शुभ बुद्ध पूर्णिमा",
+              "fontId": "hindi",
+              "fontSize": 52.0,
+              "color": "#5B21B6",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 300.0, "width": 900.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "BUDDHA PURNIMA",
+              "fontId": "bold",
+              "fontSize": 42.0,
+              "color": "#1E1B4B",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 460.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "Walk gently. Speak kindly. Live mindfully.",
+              "fontId": "cursive",
+              "fontSize": 32.0,
+              "color": "#57534E",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 620.0, "width": 840.0, "height": 120.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hanukkah",
+      "name": "Hanukkah",
+      "tagline": "Festival of Lights & Miracles",
+      "category": "Jewish",
+      "icon": "🕎",
+      "templates": [
+        {
+          "id": "hanukkah-01",
+          "title": "Happy Hanukkah",
+          "backgroundColor": "gradient:#1E3A8A,#F8FAFC",
+          "borderStyle": "deco",
+          "borderColor": "#FDE68A",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "חנוכה שמח",
+              "fontId": "default",
+              "fontSize": 64.0,
+              "color": "#1E3A8A",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 300.0, "width": 880.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY HANUKKAH",
+              "fontId": "bold",
+              "fontSize": 48.0,
+              "color": "#0F172A",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 480.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May your nights glow with miracles, warmth, and hope.",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#334155",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "hanukkah-02",
+          "title": "Festival of Lights Hanukkah",
+          "backgroundColor": "#0B1220",
+          "borderStyle": "double",
+          "borderColor": "#D8E7FF",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "🕎 FESTIVAL OF LIGHTS",
+              "fontId": "serif",
+              "fontSize": 28.0,
+              "color": "#FBBF24",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 320.0, "width": 880.0, "height": 80.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY HANUKKAH",
+              "fontId": "bold",
+              "fontSize": 52.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 440.0, "width": 880.0, "height": 120.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "Eight nights of light, love, and gratitude.",
+              "fontId": "default",
+              "fontSize": 30.0,
+              "color": "#CBD5E1",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 620.0, "width": 840.0, "height": 120.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lunar-new-year",
+      "name": "Lunar New Year",
+      "tagline": "Prosperity, Fortune & Family",
+      "category": "Cultural",
+      "icon": "🧧",
+      "templates": [
+        {
+          "id": "lunar-01",
+          "title": "Gong Xi Fa Cai",
+          "backgroundColor": "gradient:#7F1D1D,#F59E0B",
+          "borderStyle": "deco",
+          "borderColor": "#FFF1CA",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "恭喜发财",
+              "fontId": "default",
+              "fontSize": 72.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 280.0, "width": 880.0, "height": 160.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY LUNAR NEW YEAR",
+              "fontId": "bold",
+              "fontSize": 40.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 480.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "Wishing you fortune, health, and happiness all year.",
+              "fontId": "serif",
+              "fontSize": 30.0,
+              "color": "#FEF9C3",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "lunar-02",
+          "title": "Spring Festival Red",
+          "backgroundColor": "#9F1239",
+          "borderStyle": "ribbon",
+          "borderColor": "#F5C45E",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "新年快乐",
+              "fontId": "default",
+              "fontSize": 68.0,
+              "color": "#FDE68A",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 320.0, "width": 880.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "Happy Chinese New Year",
+              "fontId": "serif",
+              "fontSize": 36.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 520.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "onam",
+      "name": "Onam",
+      "tagline": "Harvest Joy of Kerala",
+      "category": "Hindu",
+      "icon": "🌼",
+      "templates": [
+        {
+          "id": "onam-01",
+          "title": "Happy Onam",
+          "backgroundColor": "gradient:#14532D,#FACC15",
+          "borderStyle": "lotus",
+          "borderColor": "#FFF1CA",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "ഓണാശംസകൾ",
+              "fontId": "default",
+              "fontSize": 56.0,
+              "color": "#14532D",
+              "alignment": "center",
+              "transform": {"x": 90.0, "y": 300.0, "width": 900.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY ONAM",
+              "fontId": "bold",
+              "fontSize": 52.0,
+              "color": "#1C1917",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 480.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May King Mahabali’s return bring prosperity to your home.",
+              "fontId": "serif",
+              "fontSize": 28.0,
+              "color": "#365314",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 640.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pongal",
+      "name": "Pongal / Sankranti",
+      "tagline": "Harvest Thanks & Sunshine",
+      "category": "Hindu",
+      "icon": "☀️",
+      "templates": [
+        {
+          "id": "pongal-01",
+          "title": "Happy Pongal",
+          "backgroundColor": "gradient:#EA580C,#FDE68A",
+          "borderStyle": "kalash",
+          "borderColor": "#713F12",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "இனிய பொங்கல் நல்வாழ்த்துக்கள்",
+              "fontId": "tamil",
+              "fontSize": 40.0,
+              "color": "#7C2D12",
+              "alignment": "center",
+              "transform": {"x": 80.0, "y": 280.0, "width": 920.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY PONGAL",
+              "fontId": "bold",
+              "fontSize": 52.0,
+              "color": "#1C1917",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 460.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            },
+            {
+              "id": "t3",
+              "type": "text",
+              "text": "May your harvest be sweet and your days be sunny.",
+              "fontId": "serif",
+              "fontSize": 28.0,
+              "color": "#44403C",
+              "alignment": "center",
+              "transform": {"x": 120.0, "y": 620.0, "width": 840.0, "height": 140.0, "rotation": 0.0}
+            }
+          ]
+        },
+        {
+          "id": "sankranti-01",
+          "title": "Happy Makar Sankranti",
+          "backgroundColor": "#0EA5E9",
+          "borderStyle": "mango",
+          "borderColor": "#FFF5D6",
+          "layers": [
+            {
+              "id": "t1",
+              "type": "text",
+              "text": "मकर संक्रांति की शुभकामनाएँ",
+              "fontId": "hindi",
+              "fontSize": 40.0,
+              "color": "#FFFFFF",
+              "alignment": "center",
+              "transform": {"x": 80.0, "y": 320.0, "width": 920.0, "height": 140.0, "rotation": 0.0}
+            },
+            {
+              "id": "t2",
+              "type": "text",
+              "text": "HAPPY SANKRANTI",
+              "fontId": "bold",
+              "fontSize": 44.0,
+              "color": "#FEF3C7",
+              "alignment": "center",
+              "transform": {"x": 100.0, "y": 520.0, "width": 880.0, "height": 100.0, "rotation": 0.0}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
