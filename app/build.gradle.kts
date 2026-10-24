@@ -13,20 +13,25 @@ val signingProperties = Properties().apply {
 }
 
 fun signingValue(property: String, environment: String): String? =
-    providers.environmentVariable(environment).orNull ?: signingProperties.getProperty(property)
+    providers.environmentVariable(environment).orNull
+        ?.takeIf { it.isNotBlank() }
+        ?: signingProperties.getProperty(property)?.takeIf { it.isNotBlank() }
 
-val releaseStoreFile = signingValue("storeFile", "WISHFEST_STORE_FILE") ?: "app/wishfest-release-key.jks"
-val releaseStorePassword = signingValue("storePassword", "WISHFEST_STORE_PASSWORD") ?: "WishFest2026Pass"
-val releaseKeyAlias = signingValue("keyAlias", "WISHFEST_KEY_ALIAS") ?: "wishfest_key"
-val releaseKeyPassword = signingValue("keyPassword", "WISHFEST_KEY_PASSWORD") ?: "WishFest2026Pass"
+// Credentials must come from env vars or local keystore.properties — never hardcoded.
+val releaseStoreFilePath = signingValue("storeFile", "WISHFEST_STORE_FILE")
+val releaseStorePassword = signingValue("storePassword", "WISHFEST_STORE_PASSWORD")
+val releaseKeyAlias = signingValue("keyAlias", "WISHFEST_KEY_ALIAS")
+val releaseKeyPassword = signingValue("keyPassword", "WISHFEST_KEY_PASSWORD")
 
-val keystoreFile = listOf(
-    rootProject.file(releaseStoreFile),
-    file(releaseStoreFile),
-    file("wishfest-release-key.jks")
-).firstOrNull { it.isFile }
+val keystoreFile = releaseStoreFilePath?.let { path ->
+    listOf(rootProject.file(path), file(path))
+        .firstOrNull { it.isFile }
+}
 
-val hasReleaseSigning = keystoreFile != null && releaseStorePassword.isNotBlank()
+val hasReleaseSigning = keystoreFile != null &&
+    !releaseStorePassword.isNullOrBlank() &&
+    !releaseKeyAlias.isNullOrBlank() &&
+    !releaseKeyPassword.isNullOrBlank()
 
 android {
     namespace = "com.nipu.wishfest"
@@ -63,7 +68,7 @@ android {
     }
 
     signingConfigs {
-        if (hasReleaseSigning && keystoreFile != null) {
+        if (hasReleaseSigning) {
             create("release") {
                 storeFile = keystoreFile
                 storePassword = releaseStorePassword
@@ -140,4 +145,52 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+}
+
+val validateReleaseSigning = tasks.register("validateReleaseSigning") {
+    doLast {
+        // Resolve at execution time so we never rely on a stale config-time snapshot.
+        fun liveSigningValue(property: String, environment: String): String? {
+            val fromEnv = System.getenv(environment)?.takeIf { it.isNotBlank() }
+            if (fromEnv != null) return fromEnv
+            val props = Properties().apply {
+                val propertiesFile = rootProject.file("keystore.properties")
+                if (propertiesFile.exists()) propertiesFile.inputStream().use { load(it) }
+            }
+            return props.getProperty(property)?.takeIf { it.isNotBlank() }
+        }
+
+        val storePath = liveSigningValue("storeFile", "WISHFEST_STORE_FILE")
+        val storePassword = liveSigningValue("storePassword", "WISHFEST_STORE_PASSWORD")
+        val keyAlias = liveSigningValue("keyAlias", "WISHFEST_KEY_ALIAS")
+        val keyPassword = liveSigningValue("keyPassword", "WISHFEST_KEY_PASSWORD")
+        val resolvedKeystore = storePath?.let { path ->
+            listOf(rootProject.file(path), project.file(path))
+                .firstOrNull { it.isFile }
+        }
+
+        check(!storePath.isNullOrBlank()) {
+            "Release storeFile is missing. Set storeFile in keystore.properties or WISHFEST_STORE_FILE."
+        }
+        check(resolvedKeystore?.isFile == true) {
+            "Release keystore file was not found at '$storePath'."
+        }
+        check(!storePassword.isNullOrBlank()) {
+            "Release storePassword is missing. Use keystore.properties or WISHFEST_STORE_PASSWORD."
+        }
+        check(!keyAlias.isNullOrBlank()) {
+            "Release keyAlias is missing. Use keystore.properties or WISHFEST_KEY_ALIAS."
+        }
+        check(!keyPassword.isNullOrBlank()) {
+            "Release keyPassword is missing. Use keystore.properties or WISHFEST_KEY_PASSWORD."
+        }
+    }
+}
+
+tasks.matching {
+    it.name == "bundleRelease" ||
+        it.name == "assembleRelease" ||
+        it.name == "publishReleaseBundle"
+}.configureEach {
+    dependsOn(validateReleaseSigning)
 }
