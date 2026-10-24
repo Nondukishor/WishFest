@@ -44,8 +44,14 @@ android {
         applicationId = "com.nipu.wishfest"
         minSdk = 29
         targetSdk = 37
-        versionCode = 2
-        versionName = "1.0"
+        // CI can override: -Pwishfest.versionCode=<n> -Pwishfest.versionName=<name>
+        versionCode = providers.gradleProperty("wishfest.versionCode")
+            .map { it.toInt() }
+            .orElse(2)
+            .get()
+        versionName = providers.gradleProperty("wishfest.versionName")
+            .orElse("1.0")
+            .get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

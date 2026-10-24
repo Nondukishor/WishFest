@@ -57,8 +57,11 @@ Workflow: `.github/workflows/publish-play.yml`
 
 **Triggers**
 
-- Manual: Actions → **Publish to Google Play** → choose track + status
-- Tag push: `v1.0.1`, `v2.0.0`, … (uploads to **internal** as **DRAFT**)
+- Push to `main` / `master`: uploads AAB to **production** with status **COMPLETED** (live on that track)
+- Manual: Actions → **Publish to Google Play** → choose track + status (defaults: production + COMPLETED)
+- Tag push `v1.0.1`: same as push, with `versionName` from the tag
+
+Each run sets a unique `versionCode` from `github.run_number` so Play accepts every upload.
 
 ### Required repository secrets
 

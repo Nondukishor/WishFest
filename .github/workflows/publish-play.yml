@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       track:
-        description: "Play track (internal, alpha, beta, production)"
+        description: "Play track"
         required: true
-        default: internal
+        default: production
         type: choice
         options:
           - internal
@@ -14,13 +14,13 @@ on:
           - beta
           - production
       release_status:
-        description: "Release status"
+        description: "Release status (COMPLETED = live on that track)"
         required: true
-        default: DRAFT
+        default: COMPLETED
         type: choice
         options:
-          - DRAFT
           - COMPLETED
+          - DRAFT
   push:
     branches:
       - main
@@ -35,7 +35,7 @@ concurrency:
 jobs:
   publish:
     name: Build & upload AAB
-    # Secrets must come from the GitHub Environment named "dev".
+    # Secrets come from GitHub Environment "dev"
     environment: dev
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -63,7 +63,7 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "Missing environment secret KEYSTORE_BASE64 (environment: dev)"
+            echo "::error::Missing KEYSTORE_BASE64 in GitHub Environment 'dev'"
             exit 1
           fi
           echo "$KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/wishfest-release-key.jks"
@@ -76,33 +76,49 @@ jobs:
             echo "track=${{ inputs.track }}" >> "$GITHUB_OUTPUT"
             echo "status=${{ inputs.release_status }}" >> "$GITHUB_OUTPUT"
           else
-            echo "track=internal" >> "$GITHUB_OUTPUT"
-            echo "status=DRAFT" >> "$GITHUB_OUTPUT"
+            # Push to main: publish directly to production and complete the release
+            echo "track=production" >> "$GITHUB_OUTPUT"
+            echo "status=COMPLETED" >> "$GITHUB_OUTPUT"
+          fi
+          # Unique Play versionCode per CI run (must always increase)
+          echo "version_code=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "version_name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version_name=1.0.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Publish release bundle to Play
+      - name: Publish AAB to Google Play Console
         env:
           WISHFEST_STORE_PASSWORD: ${{ secrets.WISHFEST_STORE_PASSWORD }}
           WISHFEST_KEY_ALIAS: ${{ secrets.WISHFEST_KEY_ALIAS }}
           WISHFEST_KEY_PASSWORD: ${{ secrets.WISHFEST_KEY_PASSWORD }}
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.ANDROID_PUBLISHER_CREDENTIALS }}
         run: |
-          if [ -z "$WISHFEST_STORE_PASSWORD" ] || [ -z "$WISHFEST_KEY_ALIAS" ] || [ -z "$WISHFEST_KEY_PASSWORD" ]; then
-            echo "Missing signing secrets in environment 'dev'."
+          missing=0
+          for name in WISHFEST_STORE_PASSWORD WISHFEST_KEY_ALIAS WISHFEST_KEY_PASSWORD ANDROID_PUBLISHER_CREDENTIALS; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing secret $name in GitHub Environment 'dev'"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
             exit 1
           fi
-          if [ -z "$ANDROID_PUBLISHER_CREDENTIALS" ]; then
-            echo "Missing ANDROID_PUBLISHER_CREDENTIALS in environment 'dev'."
-            exit 1
-          fi
+
           chmod +x ./gradlew
+          echo "Publishing versionCode=${{ steps.meta.outputs.version_code }} versionName=${{ steps.meta.outputs.version_name }}"
+          echo "Play track=${{ steps.meta.outputs.track }} status=${{ steps.meta.outputs.status }}"
+
           ./gradlew :app:publishReleaseBundle \
             --no-configuration-cache \
             --stacktrace \
+            -Pwishfest.versionCode="${{ steps.meta.outputs.version_code }}" \
+            -Pwishfest.versionName="${{ steps.meta.outputs.version_name }}" \
             -Pplay.track="${{ steps.meta.outputs.track }}" \
             -Pplay.releaseStatus="${{ steps.meta.outputs.status }}"
 
-      - name: Upload local AAB artifact
+      - name: Upload AAB artifact
         if: always()
         uses: actions/upload-artifact@v6
         with:
