@@ -66,8 +66,26 @@ jobs:
             echo "::error::Missing KEYSTORE_BASE64 in GitHub Environment 'dev'"
             exit 1
           fi
-          echo "$KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/wishfest-release-key.jks"
-          echo "WISHFEST_STORE_FILE=$GITHUB_WORKSPACE/wishfest-release-key.jks" >> "$GITHUB_ENV"
+
+          OUT="$GITHUB_WORKSPACE/wishfest-release-key.jks"
+          # Strip whitespace/newlines that often break pasted secrets
+          CLEAN="$(printf '%s' "$KEYSTORE_BASE64" | tr -d ' \t\r\n')"
+
+          if ! printf '%s' "$CLEAN" | base64 --decode > "$OUT" 2>/tmp/b64.err; then
+            echo "::error::KEYSTORE_BASE64 is present but not valid base64."
+            echo "Recreate it with: base64 -i app/wishfest-release-key.jks | pbcopy"
+            echo "Then paste into Environment 'dev' → secret KEYSTORE_BASE64"
+            cat /tmp/b64.err || true
+            exit 1
+          fi
+
+          if [ ! -s "$OUT" ]; then
+            echo "::error::Decoded keystore file is empty. KEYSTORE_BASE64 is wrong."
+            exit 1
+          fi
+
+          echo "Decoded keystore bytes=$(wc -c < "$OUT")"
+          echo "WISHFEST_STORE_FILE=$OUT" >> "$GITHUB_ENV"
 
       - name: Resolve Play track
         id: meta

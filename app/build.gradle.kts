@@ -46,10 +46,11 @@ android {
         targetSdk = 37
         // CI can override: -Pwishfest.versionCode=<n> -Pwishfest.versionName=<name>
         versionCode = providers.gradleProperty("wishfest.versionCode")
-            .map { it.toInt() }
+            .map { raw -> raw.toIntOrNull()?.takeIf { it > 0 } ?: 2 }
             .orElse(2)
             .get()
         versionName = providers.gradleProperty("wishfest.versionName")
+            .map { raw -> raw.takeIf { it.isNotBlank() } ?: "1.0" }
             .orElse("1.0")
             .get()
 
