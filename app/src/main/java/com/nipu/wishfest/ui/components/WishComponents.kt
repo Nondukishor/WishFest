@@ -1,5 +1,7 @@
 package com.nipu.wishfest.ui.components
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,9 +56,9 @@ fun WishScreenBackground(modifier: Modifier = Modifier, content: @Composable () 
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF16121C),
+                        Color(0xFF1B1926),
                         Ink,
-                        Color(0xFF0A0810)
+                        Ink
                     )
                 )
             )
@@ -87,40 +89,18 @@ fun WishBottomBar(
                 selected = selected == destination.tab,
                 onClick = destination.action,
                 icon = { Icon(destination.icon, contentDescription = null) },
-                label = { Text(destination.label, maxLines = 1) }
+                label = { Text(destination.label, maxLines = 1,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = if (selected == destination.tab) FontWeight.Bold else FontWeight.Medium) },
+                colors = androidx.compose.material3.NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
         }
-    }
-}
-
-@Composable
-private fun NavItem(
-    selected: Boolean,
-    selectedIcon: ImageVector,
-    unselectedIcon: ImageVector,
-    label: String,
-    onClick: () -> Unit
-) {
-    val tint = if (selected) Marigold else MaterialTheme.colorScheme.onSurfaceVariant
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 4.dp)
-    ) {
-        Icon(
-            imageVector = if (selected) selectedIcon else unselectedIcon,
-            contentDescription = label,
-            tint = tint,
-            modifier = Modifier.size(22.dp)
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = tint,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
-        )
     }
 }
 
@@ -214,5 +194,53 @@ fun CardPreview(project: com.nipu.wishfest.domain.models.ProjectModel, modifier:
             androidx.compose.foundation.Image(it.asImageBitmap(), contentDescription = project.title,
                 modifier = Modifier.matchParentSize(), contentScale = androidx.compose.ui.layout.ContentScale.Fit)
         } ?: androidx.compose.material3.CircularProgressIndicator(modifier = Modifier.size(24.dp))
+    }
+}
+
+/** One creation entry point shared by every main destination. */
+@Composable
+fun CreateCardDialog(onDismiss: () -> Unit, onAi: () -> Unit, onBlank: () -> Unit, onTemplates: () -> Unit) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Make something personal", style = MaterialTheme.typography.headlineSmall) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("How would you like to start?", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                CreateOption(Icons.Default.AutoAwesome, "Create with AI", "Turn an occasion into a personalized card", onAi)
+                CreateOption(Icons.Default.Palette, "Browse templates", "Pick a ready-made design and make it yours", onTemplates)
+                CreateOption(Icons.Default.Add, "Start from scratch", "A blank canvas for your own ideas", onBlank)
+            }
+        },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = onDismiss) { Text("Close") } }
+    )
+}
+
+@Composable
+private fun CreateOption(icon: ImageVector, title: String, description: String, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)) {
+        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleSmall)
+                Text(description, style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+@Composable
+fun QuickAccessCard(title: String, subtitle: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(onClick = onClick, modifier = modifier, shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+            Text(title, style = MaterialTheme.typography.titleSmall)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -36,6 +38,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
@@ -76,6 +79,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -125,7 +129,7 @@ fun EditorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Make it yours", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
+                title = { Text("Edit card", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
                 navigationIcon = {
                     IconButton(
                         onClick = onNavigateBack,
@@ -160,7 +164,7 @@ fun EditorScreen(
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.padding(end = 12.dp)
                     ) {
-                        Text("Next", fontWeight = FontWeight.Bold)
+                        Text("Export", fontWeight = FontWeight.Bold)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -202,6 +206,7 @@ fun EditorScreen(
                             modifier = Modifier.fillMaxSize()
                         )
 
+                        var canvasSize by remember { mutableStateOf(IntSize(1, 1)) }
                         currentProject.layers.find { it.id == state.selectedLayerId }?.let { selected ->
                             Canvas(Modifier.fillMaxSize()) {
                                 val t = selected.transform
@@ -215,7 +220,6 @@ fun EditorScreen(
                             }
                         }
 
-                        var canvasSize by remember { mutableStateOf(IntSize(1, 1)) }
                         fun hitLayer(position: Offset): LayerModel? = currentProject.layers.lastOrNull { layer ->
                             val x = position.x * currentProject.canvas.width / canvasSize.width
                             val y = position.y * currentProject.canvas.height / canvasSize.height
@@ -229,7 +233,11 @@ fun EditorScreen(
                         }
                         Box(Modifier.fillMaxSize().onSizeChanged { canvasSize = it }
                             .pointerInput(currentProject, canvasSize) {
-                                detectTapGestures { viewModel.selectLayer(hitLayer(it)?.id) }
+                                detectTapGestures {
+                                    val layer = hitLayer(it)
+                                    viewModel.selectLayer(layer?.id)
+                                    if (layer is LayerModel.Image) selectedTabIndex = 1
+                                }
                             }
                             .pointerInput(currentProject.id, canvasSize) {
                                 var draggedId: String? = null
@@ -260,6 +268,48 @@ fun EditorScreen(
                                 )
                             })
 
+                        val selectedImage = currentProject.layers.filterIsInstance<LayerModel.Image>()
+                            .find { it.id == state.selectedLayerId && it.visible && !it.locked }
+                        if (selectedImage != null && canvasSize.width > 1) {
+                            val t = selectedImage.transform
+                            val sx = canvasSize.width.toFloat() / currentProject.canvas.width
+                            val sy = canvasSize.height.toFloat() / currentProject.canvas.height
+                            val angle = Math.toRadians(t.rotation.toDouble())
+                            val dx = t.width * sx / 2
+                            val dy = t.height * sy / 2
+                            val cornerX = (t.x + t.width / 2) * sx + dx * kotlin.math.cos(angle).toFloat() - dy * kotlin.math.sin(angle).toFloat()
+                            val cornerY = (t.y + t.height / 2) * sy + dx * kotlin.math.sin(angle).toFloat() + dy * kotlin.math.cos(angle).toFloat()
+                            val handleSize = with(LocalDensity.current) { 44.dp.toPx() }
+                            Box(Modifier.offset {
+                                IntOffset(
+                                    (cornerX - handleSize / 2).coerceIn(0f, (canvasSize.width - handleSize).coerceAtLeast(0f)).toInt(),
+                                    (cornerY - handleSize / 2).coerceIn(0f, (canvasSize.height - handleSize).coerceAtLeast(0f)).toInt())
+                            }.size(44.dp).clip(CircleShape).background(NeonAccent)
+                                .border(2.dp, Color.White, CircleShape)
+                                .pointerInput(selectedImage.id, canvasSize) {
+                                    var initial: TransformModel? = null
+                                    var total = Offset.Zero
+                                    detectDragGestures(
+                                        onDragStart = {
+                                            initial = viewModel.uiState.value.project?.layers?.find { it.id == selectedImage.id }?.transform
+                                            total = Offset.Zero
+                                            selectedTabIndex = 1
+                                        },
+                                        onDrag = { change, amount ->
+                                            change.consume()
+                                            total += amount
+                                            initial?.let { original ->
+                                                viewModel.updateLayerTransform(selectedImage.id,
+                                                    com.nipu.wishfest.domain.models.resizeImageFromCorner(original,
+                                                        total.x / sx, total.y / sy,
+                                                        currentProject.canvas.width, currentProject.canvas.height))
+                                            }
+                                        })
+                                }, contentAlignment = Alignment.Center) {
+                                Icon(Icons.Default.OpenInFull, contentDescription = "Resize selected image",
+                                    tint = Color.Black, modifier = Modifier.size(22.dp))
+                            }
+                        }
                     }
                 }
             }
@@ -276,7 +326,7 @@ fun EditorScreen(
                 Column {
                     val tabs = listOf("Message", "Elements", "Background", "Decorate")
 
-                    androidx.compose.material3.ScrollableTabRow(selectedTabIndex = selectedTabIndex, edgePadding = 8.dp) {
+                    androidx.compose.material3.PrimaryScrollableTabRow(selectedTabIndex = selectedTabIndex, edgePadding = 8.dp) {
                         tabs.forEachIndexed { index, title ->
                             Tab(
                                 selected = selectedTabIndex == index,
@@ -296,7 +346,7 @@ fun EditorScreen(
                                     selectedTabIndex = if (layer is LayerModel.Text && layer.fontId == "sticker") 3 else if (layer is LayerModel.Text) 0 else 1
                                 }, label = { Text(when (layer) {
                                     is LayerModel.Text -> layer.text.replace("\n", " ").take(18)
-                                    is LayerModel.Image -> "Photo"
+                                    is LayerModel.Image -> com.nipu.wishfest.domain.models.DevotionalArtworks.nameFor(layer.assetPath)
                                 }, maxLines = 1) })
                         }
                     }
@@ -313,6 +363,10 @@ fun EditorScreen(
                                 onReplaceWithAiWish = viewModel::replaceTextWithAiWish
                             )
                             1 -> LayersControlTab(
+                                project = currentProject,
+                                selectedLayerId = state.selectedLayerId,
+                                onAddImage = viewModel::addImageLayer,
+                                onUpdateImage = viewModel::updateLayerTransform,
                                 onAddText = viewModel::addTextLayer,
                                 onDeleteLayer = viewModel::deleteSelectedLayer
                             )
@@ -515,10 +569,10 @@ fun TextControlTab(
             .verticalScroll(scrollState)
     ) {
         if (selectedLayer != null) {
-            Row(
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text("Your message", fontWeight = FontWeight.Bold)
                 Button(
@@ -590,10 +644,10 @@ fun TextControlTab(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text("Text color", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                 OutlinedButton(onClick = { showColorPicker = true }) {
@@ -624,6 +678,10 @@ fun TextControlTab(
 
 @Composable
 fun LayersControlTab(
+    project: ProjectModel,
+    selectedLayerId: String?,
+    onAddImage: (String) -> Unit,
+    onUpdateImage: (String, TransformModel) -> Unit,
     onAddText: (String) -> Unit,
     onDeleteLayer: () -> Unit
 ) {
@@ -631,6 +689,30 @@ fun LayersControlTab(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        val selectedImage = project.layers.filterIsInstance<LayerModel.Image>().find { it.id == selectedLayerId }
+        if (selectedImage != null) {
+            Text("Selected image · ${com.nipu.wishfest.domain.models.DevotionalArtworks.nameFor(selectedImage.assetPath)}",
+                fontWeight = FontWeight.Bold)
+            Text("Drag the image to move it. Drag its gold corner handle to resize.", style = MaterialTheme.typography.bodySmall)
+            val ratio = selectedImage.transform.height / selectedImage.transform.width.coerceAtLeast(1f)
+            val maximumSize = minOf(project.canvas.width.toFloat(), project.canvas.height / ratio)
+            val minimumSize = minOf(minOf(project.canvas.width, project.canvas.height) * .08f, maximumSize)
+            Text("Image size · ${(selectedImage.transform.width / project.canvas.width * 100).toInt()}%", style = MaterialTheme.typography.labelLarge)
+            Slider(value = selectedImage.transform.width.coerceIn(minimumSize, maximumSize),
+                valueRange = minimumSize..maximumSize,
+                onValueChange = { size ->
+                    onUpdateImage(selectedImage.id, com.nipu.wishfest.domain.models.resizeImage(
+                        selectedImage.transform, size, project.canvas.width, project.canvas.height))
+                })
+            Text("Rotation · ${selectedImage.transform.rotation.toInt()}°", style = MaterialTheme.typography.labelLarge)
+            Slider(value = selectedImage.transform.rotation.coerceIn(-180f, 180f), valueRange = -180f..180f,
+                onValueChange = { onUpdateImage(selectedImage.id, selectedImage.transform.copy(rotation = it)) })
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { onAddImage(selectedImage.assetPath) }) { Text("Duplicate image") }
+                TextButton(onClick = onDeleteLayer) { Text("Remove image") }
+            }
+        }
+        DevotionalImagePicker(onAddImage)
         Text("Quick Greetings", fontWeight = FontWeight.Bold)
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             item {
@@ -670,9 +752,39 @@ fun LayersControlTab(
             }
             Button(
                 onClick = onDeleteLayer,
+                enabled = selectedLayerId != null,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("🗑️ Delete Selected")
+            }
+        }
+    }
+}
+
+@Composable
+private fun DevotionalImagePicker(onAddImage: (String) -> Unit) {
+    val context = LocalContext.current
+    Text("Devotional images", fontWeight = FontWeight.Bold)
+    Text("Tap to add Lakshmi, Ganesh or Kali to your wish.", style = MaterialTheme.typography.bodySmall)
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        items(com.nipu.wishfest.domain.models.DevotionalArtworks.items, key = { it.assetPath }) { artwork ->
+            val thumbnail = remember(artwork.assetPath) {
+                context.assets.open(artwork.assetPath).use {
+                    android.graphics.BitmapFactory.decodeStream(it, null,
+                        android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 })
+                }
+            }
+            Surface(onClick = { onAddImage(artwork.assetPath) },
+                modifier = Modifier.size(width = 112.dp, height = 142.dp),
+                shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surfaceVariant,
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)) {
+                Column(Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    thumbnail?.let {
+                        Image(it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(96.dp))
+                    }
+                    Text(artwork.name, style = MaterialTheme.typography.labelLarge)
+                }
             }
         }
     }
@@ -868,6 +980,14 @@ private fun DecorationControlTab(project: ProjectModel, selectedId: String?, vie
                     onClick = { viewModel.updateBorder(style, project.canvas.borderColor) }, label = { Text(label) })
             }
         }
+        Text("Lakshmi Puja frames", fontWeight = FontWeight.Bold)
+        Text("Lotus, alpana and glowing diyas for a wish of peace and prosperity.", style = MaterialTheme.typography.bodySmall)
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(com.nipu.wishfest.rendering.HinduFestivalFrames.lakshmiOptions.toList()) { (style, label) ->
+                FilterChip(selected = project.canvas.borderStyle == style,
+                    onClick = { viewModel.updateBorder(style, project.canvas.borderColor) }, label = { Text(label) })
+            }
+        }
         Text("Wedding invitation frames", fontWeight = FontWeight.Bold)
         Text("Frame your invitation, then edit the names, date, venue and RSVP in Message.", style = MaterialTheme.typography.bodySmall)
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -879,7 +999,7 @@ private fun DecorationControlTab(project: ProjectModel, selectedId: String?, vie
         Text("Hindu festival frames", fontWeight = FontWeight.Bold)
         Text("Light up Puja, Diwali and other festive wishes.", style = MaterialTheme.typography.bodySmall)
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(com.nipu.wishfest.rendering.HinduFestivalFrames.options.toList()) { (style, label) ->
+            items(com.nipu.wishfest.rendering.HinduFestivalFrames.options.filterKeys { it !in com.nipu.wishfest.rendering.HinduFestivalFrames.lakshmiOptions }.toList()) { (style, label) ->
                 FilterChip(selected = project.canvas.borderStyle == style,
                     onClick = { viewModel.updateBorder(style, project.canvas.borderColor) }, label = { Text(label) })
             }

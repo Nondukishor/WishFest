@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -108,7 +110,10 @@ fun HomeScreen(
     onOpenTemplate: (ProjectModel) -> Unit,
     onOpenTemplates: () -> Unit,
     onOpenProjects: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    onCreateCard: () -> Unit,
+    requestAiCard: Boolean = false,
+    onAiRequestHandled: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -116,6 +121,12 @@ fun HomeScreen(
     val state by viewModel.uiState.collectAsState()
 
     var showAiCardDialog by remember { mutableStateOf(false) }
+    androidx.compose.runtime.LaunchedEffect(requestAiCard) {
+        if (requestAiCard) {
+            showAiCardDialog = true
+            onAiRequestHandled()
+        }
+    }
     var aiPrompt by remember { mutableStateOf("") }
     var aiRecipient by remember { mutableStateOf("Loved One") }
     var aiLanguage by remember { mutableStateOf("English") }
@@ -147,7 +158,7 @@ fun HomeScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
-                        "Works offline. Uses on-device AI when available, or ready-written wishes.",
+                        "Tell us the occasion and who it’s for. You can edit every detail afterward.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -242,7 +253,7 @@ fun HomeScreen(
                     selected = WishTab.Home,
                     onHome = { },
                     onTemplates = onOpenTemplates,
-                    onCreate = { showAiCardDialog = true },
+                    onCreate = onCreateCard,
                     onProjects = onOpenProjects
                 )
             }
@@ -258,19 +269,14 @@ fun HomeScreen(
                 }
 
                 item {
-                    CreateHeroCard(onCreate = { showAiCardDialog = true })
-                    TextButton(onClick = onOpenTemplates, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-                        Text("Or explore ready-made templates →")
+                    CreateHeroCard(onCreate = onCreateCard)
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        com.nipu.wishfest.ui.components.QuickAccessCard("Templates", "Find your next design",
+                            Icons.Default.Palette, onOpenTemplates, Modifier.weight(1f))
+                        com.nipu.wishfest.ui.components.QuickAccessCard("My cards", "Pick up where you left off",
+                            Icons.Default.FolderOpen, onOpenProjects, Modifier.weight(1f))
                     }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    FestivalStrip(
-                        festivals = state.festivals,
-                        selectedCategory = state.selectedCategory,
-                        onSelect = viewModel::onCategorySelected
-                    )
                 }
 
                 item {
@@ -349,7 +355,7 @@ private fun HomeHeader(onOpenSettings: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(Modifier.weight(1f)) {
             Text(
                 "WishFest",
                 style = MaterialTheme.typography.headlineMedium,
@@ -394,9 +400,9 @@ private fun CreateHeroCard(onCreate: () -> Unit) {
                 .background(
                     Brush.linearGradient(
                         colors = listOf(
-                            Color(0xFF3A2A12),
-                            Color(0xFF2A1A28),
-                            Color(0xFF1A1624)
+                            Color(0xFF3D304B),
+                            Color(0xFF322736),
+                            Color(0xFF232330)
                         )
                     )
                 )
@@ -408,7 +414,7 @@ private fun CreateHeroCard(onCreate: () -> Unit) {
                     color = Marigold.copy(alpha = 0.18f)
                 ) {
                     Text(
-                        "Made for someone special",
+                        "A little thought. A lasting smile.",
                         style = MaterialTheme.typography.labelMedium,
                         color = MarigoldSoft,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
@@ -416,13 +422,13 @@ private fun CreateHeroCard(onCreate: () -> Unit) {
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    "Make a card in seconds",
+                    "Make their day.",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    "Choose an occasion, add your message, then make it yours with stickers and frames.",
+                    "Start with AI, a template, or your own idea. Make every wish personal.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -449,63 +455,6 @@ private fun CreateHeroCard(onCreate: () -> Unit) {
                         )
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun FestivalStrip(
-    festivals: List<FestivalItem>,
-    selectedCategory: String,
-    onSelect: (String) -> Unit
-) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(festivals) { festival ->
-            val selected = selectedCategory.equals(festival.category, ignoreCase = true) ||
-                selectedCategory.equals(festival.name, ignoreCase = true)
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .width(72.dp)
-                    .clickable { onSelect(festival.category) }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (selected) {
-                                Brush.linearGradient(listOf(Marigold, Blush))
-                            } else {
-                                Brush.linearGradient(listOf(SurfaceOverlay, SurfaceRaised))
-                            }
-                        )
-                        .padding(if (selected) 2.5.dp else 1.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.surface,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(festival.icon, fontSize = 24.sp)
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    festival.name.split(" ").firstOrNull() ?: festival.name,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-                    color = if (selected) Marigold else MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
             }
         }
     }
@@ -615,7 +564,7 @@ fun TemplateCard(
     template: TemplateItem,
     onClick: () -> Unit
 ) {
-    Box(Modifier.width(200.dp)) {
+    Box(Modifier.width(160.dp)) {
         com.nipu.wishfest.ui.templates.LargeTemplateCard(template, onClick)
     }
 }

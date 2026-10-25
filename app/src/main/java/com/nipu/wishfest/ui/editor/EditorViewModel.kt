@@ -234,9 +234,13 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     fun addImageLayer(assetPath: String) {
         val currentProject = _uiState.value.project ?: return
         val newId = UUID.randomUUID().toString()
+        val imageSize = minOf(currentProject.canvas.width, currentProject.canvas.height) * .5f
         val newLayer = LayerModel.Image(
             id = newId,
-            transform = TransformModel(x = 240f, y = 240f, width = 600f, height = 600f),
+            transform = TransformModel(
+                x = (currentProject.canvas.width - imageSize) / 2,
+                y = (currentProject.canvas.height - imageSize) / 2,
+                width = imageSize, height = imageSize),
             assetPath = assetPath
         )
 

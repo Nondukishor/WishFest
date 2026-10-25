@@ -414,6 +414,7 @@ class SceneRenderer(private val context: Context) {
 
         val paint = Paint().apply {
             isAntiAlias = true
+            isFilterBitmap = true
             alpha = (layer.opacity * 255).toInt()
         }
 

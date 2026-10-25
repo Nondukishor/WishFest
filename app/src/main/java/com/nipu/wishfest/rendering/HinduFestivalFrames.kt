@@ -11,6 +11,11 @@ import kotlin.math.sin
 
 /** Vector motifs stay sharp in previews and exports without downloading artwork. */
 internal object HinduFestivalFrames {
+    val lakshmiOptions = linkedMapOf(
+        "lakshmi_lotus" to "Lotus & prosperity",
+        "lakshmi_alpana" to "Alpana & sacred footprints",
+        "lakshmi_diya" to "Diya & mango garland"
+    )
     val options = linkedMapOf(
         "royal_arch_garland" to "🐘 Royal Arch & Marigold Garland",
         "mandala_arch" to "👑 Royal Mandala Arch",
@@ -20,7 +25,7 @@ internal object HinduFestivalFrames {
         "toran" to "Marigold toran", "lotus" to "Lotus petals", "rangoli" to "Rangoli",
         "alpana" to "Alpana lace", "mango" to "Mango-leaf toran", "temple" to "Temple arch",
         "shankha" to "Shankha / Conch", "kalash" to "Puja kalash", "bells" to "Temple bells"
-    )
+    ).apply { putAll(lakshmiOptions) }
     val styles: Set<String> get() = options.keys
 
     fun draw(canvas: Canvas, style: String, width: Float, height: Float, color: Int) {
@@ -250,7 +255,84 @@ internal object HinduFestivalFrames {
             canvas.drawLine(-12f, 12f, -13f, 29f, outline)
         }
 
+        fun footprints(x: Float, y: Float) = canvas.withSave {
+            translate(x, y)
+            for (side in listOf(-1f, 1f)) {
+                canvas.withSave {
+                    translate(side * 22f, 0f)
+                    rotate(side * 10f)
+                    // The toes point inward toward the card, welcoming Lakshmi home.
+                    canvas.drawOval(-9f, -8f, 9f, 26f, fill)
+                    canvas.drawCircle(0f, 28f, 7f, fill)
+                    for (toe in 0..4) {
+                        val radius = 5f - toe * .65f
+                        canvas.drawCircle(side * (-8f + toe * 4.7f), -16f + toe * 2f, radius, fill)
+                    }
+                }
+            }
+        }
+
         when (style) {
+            "lakshmi_lotus" -> {
+                // Symmetrical lotus medallions and coin-like beads leave the wish clear.
+                lotus(width / 2, 140f)
+                lotus(115f, height - 92f)
+                lotus(width - 115f, height - 92f)
+                for (x in listOf(76f, width - 76f)) {
+                    var y = 170f
+                    while (y < height - 185f) {
+                        canvas.drawCircle(x, y, 9f, outline)
+                        canvas.drawCircle(x, y, 3f, fill)
+                        y += 52f
+                    }
+                }
+                canvas.drawLine(150f, 82f, width / 2 - 90f, 82f, outline)
+                canvas.drawLine(width / 2 + 90f, 82f, width - 150f, 82f, outline)
+                diya(width / 2, height - 75f)
+            }
+            "lakshmi_alpana" -> {
+                for (x in listOf(115f, width - 115f)) {
+                    mandala(x, 120f, 50f)
+                    mandala(x, height - 125f, 50f)
+                }
+                for (x in listOf(74f, width - 74f)) {
+                    var y = 220f
+                    while (y < height - 205f) {
+                        canvas.drawOval(x - 7f, y - 14f, x + 7f, y + 14f, outline)
+                        canvas.drawCircle(x, y + 23f, 3f, fill)
+                        y += 56f
+                    }
+                }
+                lotus(width / 2, 135f)
+                footprints(width / 2, height - 115f)
+                canvas.drawLine(205f, height - 100f, width / 2 - 80f, height - 100f, outline)
+                canvas.drawLine(width / 2 + 80f, height - 100f, width - 205f, height - 100f, outline)
+            }
+            "lakshmi_diya" -> {
+                val garland = Path().apply {
+                    moveTo(85f, 72f)
+                    quadTo(width / 2, 150f, width - 85f, 72f)
+                }
+                canvas.drawPath(garland, outline)
+                for (i in 0..8) {
+                    val t = i / 8f
+                    val x = 85f + t * (width - 170f)
+                    val y = 72f + 156f * t * (1f - t)
+                    flower(x, y, 12f)
+                    if (i % 2 == 1) {
+                        canvas.withSave { translate(x, y + 12f); scale(.55f, .55f); mangoLeaf(0f, 0f) }
+                    }
+                }
+                for (x in listOf(115f, width - 115f)) {
+                    diya(x, height - 95f)
+                    cornerFiligree(if (x < width / 2) 0f else width, height, x > width / 2, true)
+                }
+                lotus(width / 2, height - 85f)
+                for (x in listOf(72f, width - 72f)) {
+                    var y = 210f
+                    while (y < height - 230f) { canvas.drawCircle(x, y, 3f, fill); y += 34f }
+                }
+            }
             "royal_arch_garland" -> {
                 marigoldGarlandColumn(36f)
                 marigoldGarlandColumn(width - 36f)

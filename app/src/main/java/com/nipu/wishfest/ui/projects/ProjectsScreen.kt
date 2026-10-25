@@ -112,7 +112,7 @@ fun ProjectsScreen(
                 }
             } else {
                 LazyVerticalGrid(
-                    columns = GridCells.Adaptive(150.dp),
+                    columns = GridCells.Adaptive(128.dp),
                     contentPadding = PaddingValues(20.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -242,7 +242,7 @@ fun ProjectCard(
                         .height(48.dp),
                     contentPadding = PaddingValues(0.dp)
                 ) {
-                    Text("Continue editing", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Edit card", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         }

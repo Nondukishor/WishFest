@@ -1,6 +1,7 @@
 package com.nipu.wishfest
 
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -29,7 +30,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+        )
         setContent {
             WishfestTheme {
                 val navController = rememberNavController()
@@ -42,6 +46,17 @@ class MainActivity : ComponentActivity() {
                 var activeProjectForEditor by remember { mutableStateOf<ProjectModel?>(null) }
                 var activeProjectForExport by remember { mutableStateOf<ProjectModel?>(null) }
 
+                var showCreateMenu by remember { mutableStateOf(false) }
+                var requestAiCard by remember { mutableStateOf(false) }
+
+                fun openMainDestination(route: String) {
+                    navController.navigate(route) {
+                        popUpTo("home") { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+
                 fun createBlankCard() {
                                 activeProjectForEditor = ProjectModel(
                                     id = java.util.UUID.randomUUID().toString(), templateId = "blank", title = "My wish card",
@@ -52,6 +67,19 @@ class MainActivity : ComponentActivity() {
                                         text = "Sending you a little joy", fontId = "serif", fontSize = 64f, color = "#713F12"))
                                 )
                                 navController.navigate("editor")
+                }
+
+                if (showCreateMenu) {
+                    com.nipu.wishfest.ui.components.CreateCardDialog(
+                        onDismiss = { showCreateMenu = false },
+                        onAi = {
+                            showCreateMenu = false
+                            requestAiCard = true
+                            openMainDestination("home")
+                        },
+                        onBlank = { showCreateMenu = false; createBlankCard() },
+                        onTemplates = { showCreateMenu = false; openMainDestination("templates") }
+                    )
                 }
 
                 NavHost(
@@ -66,11 +94,14 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate("editor")
                             },
                             onOpenTemplates = {
-                                navController.navigate("templates")
+                                openMainDestination("templates")
                             },
                             onOpenProjects = {
-                                navController.navigate("projects")
+                                openMainDestination("projects")
                             },
+                            onCreateCard = { showCreateMenu = true },
+                            requestAiCard = requestAiCard,
+                            onAiRequestHandled = { requestAiCard = false },
                             onOpenSettings = {
                                 navController.navigate("settings")
                             }
@@ -88,9 +119,9 @@ class MainActivity : ComponentActivity() {
                                 navController.popBackStack("home", inclusive = false)
                             },
                             onOpenProjects = {
-                                navController.navigate("projects")
+                                openMainDestination("projects")
                             },
-                            onCreate = { createBlankCard() }
+                            onCreate = { showCreateMenu = true }
                         )
                     }
 
@@ -120,8 +151,8 @@ class MainActivity : ComponentActivity() {
                             },
                             onNavigateBack = { navController.popBackStack() },
                             onOpenHome = { navController.popBackStack("home", inclusive = false) },
-                            onOpenTemplates = { navController.navigate("templates") { launchSingleTop = true } },
-                            onCreate = { createBlankCard() }
+                            onOpenTemplates = { openMainDestination("templates") },
+                            onCreate = { showCreateMenu = true }
                         )
                     }
 
