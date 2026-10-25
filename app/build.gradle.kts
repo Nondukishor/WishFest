@@ -93,7 +93,8 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             optimization {
                 enable = true
-                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
+                // Optimize the complete app graph so cross-package access remains valid.
+                // Scoping only libraries caused IllegalAccessError during AndroidX startup.
             }
         }
     }
