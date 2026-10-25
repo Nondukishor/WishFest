@@ -132,6 +132,7 @@ class ProjectRepository(private val context: Context) {
                 layerObj.put("alignment", layer.alignment)
             } else if (layer is LayerModel.Image) {
                 layerObj.put("assetPath", layer.assetPath)
+                layerObj.put("tintColor", layer.tintColor)
             }
             layersArr.put(layerObj)
         }
@@ -204,6 +205,7 @@ class ProjectRepository(private val context: Context) {
                             id = layerId,
                             transform = transform,
                             assetPath = layerObj.optString("assetPath", ""),
+                            tintColor = layerObj.optString("tintColor", ""),
                             opacity = opacity,
                             visible = visible,
                             locked = locked

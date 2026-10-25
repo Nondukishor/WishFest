@@ -91,6 +91,7 @@ import com.nipu.wishfest.domain.models.ProjectModel
 import com.nipu.wishfest.domain.models.TransformModel
 import com.nipu.wishfest.platform.AssetManager
 import com.nipu.wishfest.rendering.SceneRenderer
+import com.nipu.wishfest.ui.theme.Marigold
 import com.nipu.wishfest.ui.theme.NeonAccent
 import kotlinx.coroutines.launch
 
@@ -367,6 +368,8 @@ fun EditorScreen(
                                 selectedLayerId = state.selectedLayerId,
                                 onAddImage = viewModel::addImageLayer,
                                 onUpdateImage = viewModel::updateLayerTransform,
+                                onUpdateImageTint = viewModel::updateImageTint,
+                                onUpdateImageOpacity = viewModel::updateImageOpacity,
                                 onAddText = viewModel::addTextLayer,
                                 onDeleteLayer = viewModel::deleteSelectedLayer
                             )
@@ -682,9 +685,15 @@ fun LayersControlTab(
     selectedLayerId: String?,
     onAddImage: (String) -> Unit,
     onUpdateImage: (String, TransformModel) -> Unit,
+    onUpdateImageTint: (String, String) -> Unit,
+    onUpdateImageOpacity: (String, Float) -> Unit,
     onAddText: (String) -> Unit,
     onDeleteLayer: () -> Unit
 ) {
+    val tintSwatches = listOf(
+        "#E5A93C", "#C41E3A", "#1E88E5", "#0F766E", "#5D4037",
+        "#8B1E3D", "#F5B942", "#1565C0", "#1B1B2F", "#FFFFFF", "#000000"
+    )
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -693,11 +702,12 @@ fun LayersControlTab(
         if (selectedImage != null) {
             Text("Selected image · ${com.nipu.wishfest.domain.models.DevotionalArtworks.nameFor(selectedImage.assetPath)}",
                 fontWeight = FontWeight.Bold)
-            Text("Drag the image to move it. Drag its gold corner handle to resize.", style = MaterialTheme.typography.bodySmall)
+            Text("Drag to move · gold corner to resize · change color below for illustrations.",
+                style = MaterialTheme.typography.bodySmall)
             val ratio = selectedImage.transform.height / selectedImage.transform.width.coerceAtLeast(1f)
             val maximumSize = minOf(project.canvas.width.toFloat(), project.canvas.height / ratio)
             val minimumSize = minOf(minOf(project.canvas.width, project.canvas.height) * .08f, maximumSize)
-            Text("Image size · ${(selectedImage.transform.width / project.canvas.width * 100).toInt()}%", style = MaterialTheme.typography.labelLarge)
+            Text("Size · ${(selectedImage.transform.width / project.canvas.width * 100).toInt()}%", style = MaterialTheme.typography.labelLarge)
             Slider(value = selectedImage.transform.width.coerceIn(minimumSize, maximumSize),
                 valueRange = minimumSize..maximumSize,
                 onValueChange = { size ->
@@ -707,6 +717,61 @@ fun LayersControlTab(
             Text("Rotation · ${selectedImage.transform.rotation.toInt()}°", style = MaterialTheme.typography.labelLarge)
             Slider(value = selectedImage.transform.rotation.coerceIn(-180f, 180f), valueRange = -180f..180f,
                 onValueChange = { onUpdateImage(selectedImage.id, selectedImage.transform.copy(rotation = it)) })
+
+            Text(
+                "Opacity · ${(selectedImage.opacity * 100).toInt()}%",
+                style = MaterialTheme.typography.labelLarge
+            )
+            Slider(
+                value = selectedImage.opacity.coerceIn(0.05f, 1f),
+                valueRange = 0.05f..1f,
+                onValueChange = { onUpdateImageOpacity(selectedImage.id, it) }
+            )
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { onUpdateImageOpacity(selectedImage.id, 1f) }) {
+                    Text("Opaque")
+                }
+                OutlinedButton(onClick = { onUpdateImageOpacity(selectedImage.id, 0.5f) }) {
+                    Text("50%")
+                }
+                OutlinedButton(onClick = { onUpdateImageOpacity(selectedImage.id, 0.25f) }) {
+                    Text("Soft")
+                }
+            }
+
+            val canTint = com.nipu.wishfest.domain.models.DevotionalArtworks.isTintable(selectedImage.assetPath) ||
+                selectedImage.tintColor.isNotBlank()
+            if (canTint) {
+                Text("Illustration color", style = MaterialTheme.typography.labelLarge)
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    item {
+                        OutlinedButton(onClick = { onUpdateImageTint(selectedImage.id, "") }) {
+                            Text("Original")
+                        }
+                    }
+                    items(tintSwatches) { hex ->
+                        val selected = selectedImage.tintColor.equals(hex, ignoreCase = true)
+                        val swatch = try {
+                            Color(android.graphics.Color.parseColor(hex))
+                        } catch (_: Exception) {
+                            Color.Gray
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(swatch)
+                                .border(
+                                    width = if (selected) 3.dp else 1.dp,
+                                    color = if (selected) Marigold else MaterialTheme.colorScheme.outline,
+                                    shape = CircleShape
+                                )
+                                .clickable { onUpdateImageTint(selectedImage.id, hex) }
+                        )
+                    }
+                }
+            }
+
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { onAddImage(selectedImage.assetPath) }) { Text("Duplicate image") }
                 TextButton(onClick = onDeleteLayer) { Text("Remove image") }
@@ -764,26 +829,83 @@ fun LayersControlTab(
 @Composable
 private fun DevotionalImagePicker(onAddImage: (String) -> Unit) {
     val context = LocalContext.current
-    Text("Devotional images", fontWeight = FontWeight.Bold)
-    Text("Tap to add Lakshmi, Ganesh or Kali to your wish.", style = MaterialTheme.typography.bodySmall)
+    var category by remember { mutableStateOf("All") }
+    val catalog = com.nipu.wishfest.domain.models.DevotionalArtworks
+    val filtered = remember(category) {
+        if (category == "All") catalog.items
+        else catalog.items.filter { it.category == category }
+    }
+
+    Text("Devotional illustrations", fontWeight = FontWeight.Bold)
+    Text("Tintable faces & symbols can change color and size after you add them.",
+        style = MaterialTheme.typography.bodySmall)
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        items(catalog.categories) { cat ->
+            FilterChip(
+                selected = category == cat,
+                onClick = { category = cat },
+                label = { Text(cat) }
+            )
+        }
+    }
     LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        items(com.nipu.wishfest.domain.models.DevotionalArtworks.items, key = { it.assetPath }) { artwork ->
+        items(filtered, key = { it.assetPath }) { artwork ->
             val thumbnail = remember(artwork.assetPath) {
                 context.assets.open(artwork.assetPath).use {
                     android.graphics.BitmapFactory.decodeStream(it, null,
                         android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 })
                 }
             }
-            Surface(onClick = { onAddImage(artwork.assetPath) },
-                modifier = Modifier.size(width = 112.dp, height = 142.dp),
-                shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surfaceVariant,
-                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)) {
-                Column(Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    thumbnail?.let {
-                        Image(it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(96.dp))
+            Surface(
+                onClick = { onAddImage(artwork.assetPath) },
+                modifier = Modifier.size(width = 112.dp, height = 148.dp),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            ) {
+                Column(
+                    Modifier.padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(96.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                if (artwork.tintable) {
+                                    try {
+                                        Color(android.graphics.Color.parseColor(artwork.defaultTint)).copy(alpha = 0.18f)
+                                    } catch (_: Exception) {
+                                        MaterialTheme.colorScheme.surface
+                                    }
+                                } else MaterialTheme.colorScheme.surface
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        thumbnail?.let {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = artwork.name,
+                                modifier = Modifier.size(88.dp),
+                                colorFilter = if (artwork.tintable) {
+                                    androidx.compose.ui.graphics.ColorFilter.tint(
+                                        try {
+                                            Color(android.graphics.Color.parseColor(artwork.defaultTint))
+                                        } catch (_: Exception) {
+                                            Marigold
+                                        }
+                                    )
+                                } else null
+                            )
+                        }
                     }
-                    Text(artwork.name, style = MaterialTheme.typography.labelLarge)
+                    Text(artwork.name, style = MaterialTheme.typography.labelLarge, maxLines = 1)
+                    Text(
+                        if (artwork.tintable) "Recolor" else "Full color",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }

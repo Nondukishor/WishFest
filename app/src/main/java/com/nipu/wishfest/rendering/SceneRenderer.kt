@@ -416,6 +416,17 @@ class SceneRenderer(private val context: Context) {
             isAntiAlias = true
             isFilterBitmap = true
             alpha = (layer.opacity * 255).toInt()
+            val tint = layer.tintColor.trim()
+            if (tint.startsWith("#") && tint.length >= 7) {
+                try {
+                    colorFilter = android.graphics.PorterDuffColorFilter(
+                        android.graphics.Color.parseColor(tint),
+                        android.graphics.PorterDuff.Mode.SRC_IN
+                    )
+                } catch (_: Exception) {
+                    // Keep original colors if tint hex is invalid.
+                }
+            }
         }
 
         canvas.drawBitmap(imgBitmap, matrix, paint)

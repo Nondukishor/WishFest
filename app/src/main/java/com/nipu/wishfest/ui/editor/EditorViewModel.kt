@@ -235,19 +235,43 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         val currentProject = _uiState.value.project ?: return
         val newId = UUID.randomUUID().toString()
         val imageSize = minOf(currentProject.canvas.width, currentProject.canvas.height) * .5f
+        val artwork = com.nipu.wishfest.domain.models.DevotionalArtworks.find(assetPath)
+        val tint = if (artwork?.tintable == true) artwork.defaultTint else ""
         val newLayer = LayerModel.Image(
             id = newId,
             transform = TransformModel(
                 x = (currentProject.canvas.width - imageSize) / 2,
                 y = (currentProject.canvas.height - imageSize) / 2,
                 width = imageSize, height = imageSize),
-            assetPath = assetPath
+            assetPath = assetPath,
+            tintColor = tint
         )
 
         val updatedLayers = currentProject.layers + newLayer
         val updatedProject = currentProject.copy(layers = updatedLayers, updatedAt = System.currentTimeMillis())
         updateAndSaveProject(updatedProject)
         selectLayer(newId)
+    }
+
+    fun updateImageTint(layerId: String, tintColor: String) {
+        val currentProject = _uiState.value.project ?: return
+        val updatedLayers = currentProject.layers.map { layer ->
+            if (layer.id == layerId && layer is LayerModel.Image) {
+                layer.copy(tintColor = tintColor)
+            } else layer
+        }
+        updateAndSaveProject(currentProject.copy(layers = updatedLayers, updatedAt = System.currentTimeMillis()))
+    }
+
+    fun updateImageOpacity(layerId: String, opacity: Float) {
+        val currentProject = _uiState.value.project ?: return
+        val clamped = opacity.coerceIn(0.05f, 1f)
+        val updatedLayers = currentProject.layers.map { layer ->
+            if (layer.id == layerId && layer is LayerModel.Image) {
+                layer.copy(opacity = clamped)
+            } else layer
+        }
+        updateAndSaveProject(currentProject.copy(layers = updatedLayers, updatedAt = System.currentTimeMillis()))
     }
 
     fun deleteSelectedLayer() {

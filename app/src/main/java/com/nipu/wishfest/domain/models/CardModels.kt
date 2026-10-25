@@ -50,6 +50,8 @@ sealed class LayerModel {
         override val id: String,
         override val transform: TransformModel,
         val assetPath: String,
+        /** Hex color for illustration tint (SRC_IN). Empty keeps original artwork colors. */
+        val tintColor: String = "",
         override val opacity: Float = 1f,
         override val visible: Boolean = true,
         override val locked: Boolean = false
