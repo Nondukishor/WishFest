@@ -57,7 +57,7 @@ std::string Serializer::serialize(const CardDocument& doc) {
         }
 
         const auto& t = layer->getTransform();
-        ss << "      \"transform\": {\"x\": " << t.x << ", \"y\": " << t.y
+        ss << R"(      "transform": {"x": )" << t.x << ", \"y\": " << t.y
            << ", \"width\": " << t.width << ", \"height\": " << t.height
            << ", \"rotation\": " << t.rotation << "},\n";
         ss << "      \"opacity\": " << layer->getOpacity() << ",\n";
@@ -138,7 +138,7 @@ std::shared_ptr<CardDocument> Serializer::deserialize(const std::string& jsonStr
     auto words_end = std::sregex_iterator();
 
     for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
-        std::smatch match = *i;
+        const std::smatch& match = *i;
         std::string block = match.str(0);
 
         std::string layerId = extractStringField(block, "id");
