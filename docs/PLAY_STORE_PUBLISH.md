@@ -57,8 +57,8 @@ Workflow: `.github/workflows/publish-play.yml`
 
 **Triggers**
 
-- Push to `main` / `master`: uploads AAB to **production** with status **COMPLETED** (live on that track)
-- Manual: Actions → **Publish to Google Play** → choose track + status (defaults: production + COMPLETED)
+- Push to `main` / `master`: submits the AAB to **closed testing (`alpha`)** with status **COMPLETED**. Google Play review and app setup requirements still apply.
+- Manual: Actions → **Publish to Google Play** → choose track + status (defaults: alpha + COMPLETED)
 - Tag push `v1.0.1`: same as push, with `versionName` from the tag
 
 Each run sets a unique `versionCode` from `github.run_number` so Play accepts every upload.
@@ -75,7 +75,7 @@ Each run sets a unique `versionCode` from `github.run_number` so Play accepts ev
 
 Add secrets under: GitHub repo → **Settings → Environments → `dev` → Environment secrets**.
 
-The workflow job uses `environment: dev`, so repository-level secrets alone are not enough.
+The workflow job uses `environment: dev`. Environment secrets take precedence over repository secrets with the same name.
 
 ### Encode keystore (macOS)
 
@@ -109,3 +109,27 @@ Play rejects uploads that reuse an existing `versionCode`.
 | `production` | Public release |
 
 Prefer `DRAFT` status from CI, then press **Roll out** in Play Console after review.
+
+## Production blocked with FAILED_PRECONDITION
+
+WishFest must complete the closed-testing requirement before production access is granted.
+The workflow therefore targets `alpha` on branch and tag pushes. In Play Console, use the
+closed testing track with the matching identifier (`alpha`); select or create that track
+and configure its testers, countries, and required app setup before publishing.
+
+At least 12 testers must opt in continuously for 14 days. Adding their email addresses
+alone does not count: share the opt-in link and ask them to join, install, test, and
+provide feedback. Internal testing does not satisfy this requirement. After the test,
+apply for production access on the Dashboard and wait for approval.
+
+Once production access is approved, manually run this workflow with `track=production`.
+Do not rerun an old failed production job to test this fix: reruns use the old workflow.
+Push the updated workflow or start a new manual run from the updated branch.
+
+If Play Console still considers the app a draft, select `DRAFT` when manually running
+this workflow and finish the initial release and required setup in Play Console.
+Do not automatically retry a rejected production release on another track.
+
+Google references:
+- https://support.google.com/googleplay/android-developer/answer/14151465
+- https://support.google.com/googleplay/android-developer/answer/9845334

@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       track:
-        description: "Play track"
+        description: "Play track (production requires approved production access)"
         required: true
-        default: production
+        default: alpha
         type: choice
         options:
           - internal
@@ -82,7 +82,8 @@ jobs:
             echo "track=${{ inputs.track }}" >> "$GITHUB_OUTPUT"
             echo "status=${{ inputs.release_status }}" >> "$GITHUB_OUTPUT"
           else
-            echo "track=production" >> "$GITHUB_OUTPUT"
+            # Closed testing is required before this app can access production.
+            echo "track=alpha" >> "$GITHUB_OUTPUT"
             echo "status=COMPLETED" >> "$GITHUB_OUTPUT"
           fi
           # Keep versionCode above previously published codes (base 100 + run_number)
