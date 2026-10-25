@@ -42,8 +42,8 @@ data class HomeUiState(
     val festivals: List<FestivalItem> = emptyList(),
     val filteredFestivals: List<FestivalItem> = emptyList(),
     val categories: List<String> = listOf(
-        "All", "Wedding", "Sunday", "New Year", "Hindu", "Islamic",
-        "Christian", "Sikh", "Buddhist", "Jewish", "Cultural"
+        "All", "Wedding", "Valentine", "Occasions", "Sunday", "New Year",
+        "Hindu", "Islamic", "Christian", "Sikh", "Buddhist", "Jewish", "Cultural"
     )
 )
 
