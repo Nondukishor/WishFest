@@ -67,7 +67,7 @@ Each run sets a unique `versionCode` from `github.run_number` so Play accepts ev
 
 | Secret | Value |
 | --- | --- |
-| `KEYSTORE_BASE64` | `base64 -i app/wishfest-release-key.jks \| pbcopy` (macOS) |
+| `KEYSTORE_BASE64` | Base64-encoded contents of the existing release keystore (see below) |
 | `WISHFEST_STORE_PASSWORD` | keystore password |
 | `WISHFEST_KEY_ALIAS` | key alias (`wishfest_key`) |
 | `WISHFEST_KEY_PASSWORD` | key password |
@@ -83,7 +83,13 @@ The workflow job uses `environment: dev`, so repository-level secrets alone are 
 base64 -i app/wishfest-release-key.jks | pbcopy
 ```
 
-Paste into the `KEYSTORE_BASE64` secret (no newlines if possible).
+Paste the copied output into the `KEYSTORE_BASE64` secret, not the command itself. Keep using the existing release key.
+
+To set it directly without copying the wrong text:
+
+```bash
+base64 -i app/wishfest-release-key.jks | gh secret set KEYSTORE_BASE64 --repo Nondukishor/WishFest --env dev
+```
 
 ## Version bumps
 

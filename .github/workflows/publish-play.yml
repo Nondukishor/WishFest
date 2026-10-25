@@ -71,40 +71,7 @@ jobs:
             exit 1
           fi
 
-          # Python decode is more tolerant than coreutils base64 (whitespace, padding).
-          python3 - <<'PY'
-          import base64, binascii, os, sys
-
-          raw = os.environ.get("KEYSTORE_BASE64", "")
-          cleaned = "".join(raw.split())
-          out = os.path.join(os.environ["GITHUB_WORKSPACE"], "wishfest-release-key.jks")
-
-          data = None
-          errors = []
-          for decoder in (
-              lambda s: base64.b64decode(s, validate=False),
-              lambda s: base64.b64decode(s + "=" * (-len(s) % 4), validate=False),
-              lambda s: base64.urlsafe_b64decode(s + "=" * (-len(s) % 4)),
-          ):
-              try:
-                  data = decoder(cleaned)
-                  if data:
-                      break
-              except (binascii.Error, ValueError) as exc:
-                  errors.append(str(exc))
-
-          if not data:
-              print("::error::KEYSTORE_BASE64 could not be decoded as base64.", file=sys.stderr)
-              print(f"secret_length={len(raw)} cleaned_length={len(cleaned)}", file=sys.stderr)
-              for err in errors:
-                  print(err, file=sys.stderr)
-              print("Recreate secret with: base64 -i app/wishfest-release-key.jks | pbcopy", file=sys.stderr)
-              sys.exit(1)
-
-          with open(out, "wb") as f:
-              f.write(data)
-          print(f"Decoded keystore bytes={len(data)}")
-          PY
+          python3 scripts/decode-keystore.py "$OUT"
 
           echo "WISHFEST_STORE_FILE=$OUT" >> "$GITHUB_ENV"
 

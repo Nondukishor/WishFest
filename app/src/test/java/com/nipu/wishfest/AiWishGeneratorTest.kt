@@ -46,6 +46,47 @@ class AiWishGeneratorTest {
         assertEquals("A lovely wish for you!", generator.generateWish("Birthday"))
     }
 
+    @Test
+    fun lakshmiSpellingsProduceRelevantHeadingAndOfflineWish() = runBlocking {
+        val generator = AiWishGenerator { null }
+        for (occasion in listOf("Laksmi Puja", "Lakshmi Puja", "Laxmi Puja", "লক্ষ্মী পূজা")) {
+            val card = generator.generateCreativeCard(occasion, "Mom")
+            val texts = card.layers.filterIsInstance<com.nipu.wishfest.domain.models.LayerModel.Text>()
+            assertEquals("HAPPY LAKSHMI PUJA", texts.first().text)
+            assertTrue(texts.last().text.contains("Goddess Lakshmi"))
+            assertTrue(texts.last().text.contains("Mom"))
+            assertTrue(texts.none { it.text.contains("Bijoya", ignoreCase = true) })
+        }
+    }
+
+    @Test
+    fun otherPujasKeepTheirOwnOccasion() = runBlocking {
+        val generator = AiWishGenerator { null }
+        for (occasion in listOf("Saraswati Puja", "Kali Puja", "Satyanarayan Puja", "Birthday for a 5 year old")) {
+            val card = generator.generateCreativeCard(occasion, language = "Hindi")
+            val texts = card.layers.filterIsInstance<com.nipu.wishfest.domain.models.LayerModel.Text>()
+            assertEquals(occasion.uppercase(), texts.first().text)
+            assertTrue(texts.last().text.contains(occasion))
+        }
+    }
+
+    @Test
+    fun bengaliLakshmiCardUsesMatchingLanguage() = runBlocking {
+        val card = AiWishGenerator { null }.generateCreativeCard("Laksmi Puja", language = "Bengali (বাংলা)")
+        val texts = card.layers.filterIsInstance<com.nipu.wishfest.domain.models.LayerModel.Text>()
+        assertEquals("শুভ লক্ষ্মী পূজা", texts.first().text)
+        assertTrue(texts.last().text.contains("মা লক্ষ্মী"))
+    }
+
+    @Test
+    fun modelPromptRequiresRequestedOccasion() = runBlocking {
+        var capturedPrompt = ""
+        val generator = AiWishGenerator { capturedPrompt = it; "Happy Lakshmi Puja!" }
+        generator.generateCreativeCard("Laksmi Puja")
+        assertTrue(capturedPrompt.contains("Laksmi Puja"))
+        assertTrue(capturedPrompt.contains("never substitute a different festival"))
+    }
+
     @Test(expected = CancellationException::class)
     fun cancellationDoesNotCreateAnUnwantedCard(): Unit = runBlocking {
         val generator = AiWishGenerator { throw CancellationException("Screen closed") }
