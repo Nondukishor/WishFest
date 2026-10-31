@@ -1,6 +1,7 @@
 package com.nipu.wishfest.ui.editor
 
 import android.graphics.Bitmap
+import androidx.core.graphics.createBitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -15,11 +16,12 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -38,6 +40,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.EmojiEmotions
 import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -53,11 +61,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -81,6 +91,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -93,7 +104,25 @@ import com.nipu.wishfest.platform.AssetManager
 import com.nipu.wishfest.rendering.SceneRenderer
 import com.nipu.wishfest.ui.theme.Marigold
 import com.nipu.wishfest.ui.theme.NeonAccent
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import androidx.core.graphics.toColorInt
+
+private class DoubleBitmapBuffer(width: Int, height: Int) {
+    private var front: Bitmap = createBitmap(width, height)
+    private var back: Bitmap = createBitmap(width, height)
+
+    @Synchronized
+    fun render(renderBlock: (Bitmap) -> Unit): Bitmap {
+        back.eraseColor(android.graphics.Color.TRANSPARENT)
+        renderBlock(back)
+        val temp = front
+        front = back
+        back = temp
+        return front
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,8 +155,39 @@ fun EditorScreen(
 
     val currentProject = state.project ?: initialProject
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val selectedLayer = currentProject.layers.find { it.id == state.selectedLayerId }
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    var removalSnapshot by remember { mutableStateOf<ProjectModel?>(null) }
+
+    // Undo belongs to this deletion only; dismiss it if another edit supersedes it.
+    LaunchedEffect(currentProject) {
+        if (removalSnapshot != null && currentProject != removalSnapshot) {
+            snackbar.currentSnackbarData?.dismiss()
+            removalSnapshot = null
+        }
+    }
+    val deleteSelection: () -> Unit = {
+        val layer = viewModel.uiState.value.project?.layers?.find { it.id == viewModel.uiState.value.selectedLayerId }
+        if (layer != null && !layer.locked) {
+            snackbar.currentSnackbarData?.dismiss()
+            viewModel.deleteSelectedLayer()
+            val snapshot = viewModel.uiState.value.project
+            removalSnapshot = snapshot
+            scope.launch {
+                val result = snackbar.showSnackbar(
+                    message = "${layerLabel(layer)} removed", actionLabel = "Undo", withDismissAction = true)
+                if (result == SnackbarResult.ActionPerformed && viewModel.uiState.value.project == snapshot) {
+                    viewModel.undo()
+                    viewModel.selectLayer(layer.id)
+                }
+                if (removalSnapshot == snapshot) removalSnapshot = null
+            }
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbar) },
         topBar = {
             TopAppBar(
                 title = { Text("Edit card", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
@@ -182,28 +242,53 @@ fun EditorScreen(
                 .imePadding()
         ) {
             // Interactive Canvas Box
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                val bitmap: Bitmap = remember(currentProject) {
-                    sceneRenderer.renderToBitmap(currentProject, 1080, 1080)
+                val cardSizeDp = minOf(maxWidth * 0.95f, maxHeight * 0.95f)
+                val doubleBuffer = remember { DoubleBitmapBuffer(720, 720) }
+                var currentBitmap by remember { mutableStateOf<Bitmap?>(null) }
+                var activeDraggingLayerId by remember { mutableStateOf<String?>(null) }
+                var baseSceneBitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+                LaunchedEffect(currentProject, activeDraggingLayerId) {
+                    val draggingId = activeDraggingLayerId
+                    val base = baseSceneBitmap
+
+                    val b = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+                        doubleBuffer.render { target ->
+                            if (draggingId != null && base != null && !base.isRecycled) {
+                                val activeLayer = currentProject.layers.find { it.id == draggingId }
+                                if (activeLayer != null) {
+                                    sceneRenderer.renderLayerOntoBase(base, currentProject, activeLayer, 720, 720, reuseBitmap = target)
+                                } else {
+                                    sceneRenderer.renderToBitmap(currentProject, 720, 720, reuseBitmap = target)
+                                }
+                            } else {
+                                sceneRenderer.renderToBitmap(currentProject, 720, 720, reuseBitmap = target)
+                            }
+                        }
+                    }
+                    if (isActive) {
+                        currentBitmap = b
+                    }
                 }
+                val previewBitmap = currentBitmap ?: remember { sceneRenderer.renderToBitmap(currentProject, 720, 720) }
 
                 Card(
                     shape = RoundedCornerShape(8.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-                    modifier = Modifier
-                        .fillMaxWidth(0.95f)
-                        .aspectRatio(1f)
+                    modifier = Modifier.size(cardSizeDp)
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Image(
-                            bitmap = bitmap.asImageBitmap(),
+                            bitmap = previewBitmap.asImageBitmap(),
                             contentDescription = "Canvas Preview",
+                            contentScale = ContentScale.FillBounds,
                             modifier = Modifier.fillMaxSize()
                         )
 
@@ -233,40 +318,81 @@ fun EditorScreen(
                             layer.visible && !layer.locked && localX >= 0 && localX <= t.width && localY >= 0 && localY <= t.height
                         }
                         Box(Modifier.fillMaxSize().onSizeChanged { canvasSize = it }
-                            .pointerInput(currentProject, canvasSize) {
-                                detectTapGestures {
-                                    val layer = hitLayer(it)
-                                    viewModel.selectLayer(layer?.id)
-                                    if (layer is LayerModel.Image) selectedTabIndex = 1
-                                }
-                            }
-                            .pointerInput(currentProject.id, canvasSize) {
-                                var draggedId: String? = null
-                                detectDragGestures(
-                                    onDragStart = { position ->
-                                        // Read latest state throughout a gesture, including previous drag updates.
-                                        val latest = viewModel.uiState.value.project ?: currentProject
-                                        val x = position.x * latest.canvas.width / canvasSize.width
-                                        val y = position.y * latest.canvas.height / canvasSize.height
-                                        draggedId = latest.layers.lastOrNull {
-                                            it.visible && !it.locked && x in it.transform.x..(it.transform.x + it.transform.width) &&
-                                                y in it.transform.y..(it.transform.y + it.transform.height)
-                                        }?.id
-                                        viewModel.selectLayer(draggedId)
-                                    },
-                                    onDrag = { change, amount ->
-                                        val latest = viewModel.uiState.value.project
-                                        val layer = latest?.layers?.find { it.id == draggedId }
-                                        if (layer != null) {
-                                            change.consume()
-                                            viewModel.updateLayerTransform(layer.id, layer.transform.copy(
-                                                x = (layer.transform.x + amount.x * latest.canvas.width / canvasSize.width)
-                                                    .coerceIn(0f, (latest.canvas.width - layer.transform.width).coerceAtLeast(0f)),
-                                                y = (layer.transform.y + amount.y * latest.canvas.height / canvasSize.height)
-                                                    .coerceIn(0f, (latest.canvas.height - layer.transform.height).coerceAtLeast(0f))))
+                            .pointerInput(canvasSize) {
+                                coroutineScope {
+                                    launch {
+                                        detectTapGestures { position ->
+                                            val layer = hitLayer(position)
+                                            viewModel.selectLayer(layer?.id)
+                                            if (layer is LayerModel.Image) selectedTabIndex = 1
                                         }
                                     }
-                                )
+                                    launch {
+                                        var draggedLayer: LayerModel? = null
+                                        var initialTransform: TransformModel? = null
+                                        var totalDragOffset = Offset.Zero
+
+                                        detectDragGestures(
+                                            onDragStart = { position ->
+                                                val layer = hitLayer(position)
+                                                viewModel.selectLayer(layer?.id)
+                                                if (layer != null && !layer.locked && layer.visible) {
+                                                    draggedLayer = layer
+                                                    initialTransform = layer.transform
+                                                    totalDragOffset = Offset.Zero
+                                                    if (layer is LayerModel.Image) selectedTabIndex = 1
+                                                    activeDraggingLayerId = layer.id
+                                                    baseSceneBitmap = sceneRenderer.renderBaseScene(currentProject, layer.id, 720, 720)
+                                                    viewModel.startGesture()
+                                                } else {
+                                                    draggedLayer = null
+                                                    initialTransform = null
+                                                    activeDraggingLayerId = null
+                                                    baseSceneBitmap = null
+                                                }
+                                            },
+                                            onDrag = { change, amount ->
+                                                val layer = draggedLayer
+                                                val initial = initialTransform
+                                                val latest = viewModel.uiState.value.project ?: currentProject
+                                                if (layer != null && initial != null && canvasSize.width > 0 && canvasSize.height > 0) {
+                                                    change.consume()
+                                                    totalDragOffset += amount
+                                                    val scaleX = latest.canvas.width.toFloat() / canvasSize.width
+                                                    val scaleY = latest.canvas.height.toFloat() / canvasSize.height
+                                                    val newX = (initial.x + totalDragOffset.x * scaleX)
+                                                        .coerceIn(0f, (latest.canvas.width - initial.width).coerceAtLeast(0f))
+                                                    val newY = (initial.y + totalDragOffset.y * scaleY)
+                                                        .coerceIn(0f, (latest.canvas.height - initial.height).coerceAtLeast(0f))
+
+                                                    viewModel.updateLayerTransform(
+                                                        layer.id,
+                                                        initial.copy(x = newX, y = newY),
+                                                        isTransient = true
+                                                    )
+                                                }
+                                            },
+                                            onDragEnd = {
+                                                if (draggedLayer != null) {
+                                                    viewModel.endGesture()
+                                                    draggedLayer = null
+                                                    initialTransform = null
+                                                    activeDraggingLayerId = null
+                                                    baseSceneBitmap = null
+                                                }
+                                            },
+                                            onDragCancel = {
+                                                if (draggedLayer != null) {
+                                                    viewModel.endGesture()
+                                                    draggedLayer = null
+                                                    initialTransform = null
+                                                    activeDraggingLayerId = null
+                                                    baseSceneBitmap = null
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
                             })
 
                         val selectedImage = currentProject.layers.filterIsInstance<LayerModel.Image>()
@@ -295,17 +421,28 @@ fun EditorScreen(
                                             initial = viewModel.uiState.value.project?.layers?.find { it.id == selectedImage.id }?.transform
                                             total = Offset.Zero
                                             selectedTabIndex = 1
+                                            viewModel.startGesture()
                                         },
                                         onDrag = { change, amount ->
                                             change.consume()
                                             total += amount
                                             initial?.let { original ->
-                                                viewModel.updateLayerTransform(selectedImage.id,
+                                                viewModel.updateLayerTransform(
+                                                    selectedImage.id,
                                                     com.nipu.wishfest.domain.models.resizeImageFromCorner(original,
                                                         total.x / sx, total.y / sy,
-                                                        currentProject.canvas.width, currentProject.canvas.height))
+                                                        currentProject.canvas.width, currentProject.canvas.height),
+                                                    isTransient = true
+                                                )
                                             }
-                                        })
+                                        },
+                                        onDragEnd = {
+                                            viewModel.endGesture()
+                                        },
+                                        onDragCancel = {
+                                            viewModel.endGesture()
+                                        }
+                                    )
                                 }, contentAlignment = Alignment.Center) {
                                 Icon(Icons.Default.OpenInFull, contentDescription = "Resize selected image",
                                     tint = Color.Black, modifier = Modifier.size(22.dp))
@@ -325,6 +462,7 @@ fun EditorScreen(
                     .weight(1.15f)
             ) {
                 Column {
+                    SelectedLayerActions(selectedLayer, deleteSelection)
                     val tabs = listOf("Message", "Elements", "Background", "Decorate")
 
                     androidx.compose.material3.PrimaryScrollableTabRow(selectedTabIndex = selectedTabIndex, edgePadding = 8.dp) {
@@ -370,8 +508,7 @@ fun EditorScreen(
                                 onUpdateImage = viewModel::updateLayerTransform,
                                 onUpdateImageTint = viewModel::updateImageTint,
                                 onUpdateImageOpacity = viewModel::updateImageOpacity,
-                                onAddText = viewModel::addTextLayer,
-                                onDeleteLayer = viewModel::deleteSelectedLayer
+                                onAddText = viewModel::addTextLayer
                             )
                             3 -> DecorationControlTab(currentProject, state.selectedLayerId, viewModel)
                             2 -> BackgroundControlTab(
@@ -390,6 +527,47 @@ fun EditorScreen(
     }
 }
 
+private fun layerLabel(layer: LayerModel): String = when (layer) {
+    is LayerModel.Image -> com.nipu.wishfest.domain.models.DevotionalArtworks.nameFor(layer.assetPath)
+    is LayerModel.Text -> if (layer.fontId == "sticker") "Sticker" else "Text"
+}
+
+@Composable
+internal fun SelectedLayerActions(layer: LayerModel?, onDelete: () -> Unit) {
+    Surface(color = MaterialTheme.colorScheme.surfaceVariant) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (layer != null) {
+                Icon(when (layer) {
+                    is LayerModel.Image -> Icons.Default.Image
+                    is LayerModel.Text -> if (layer.fontId == "sticker") Icons.Default.EmojiEmotions else Icons.Default.TextFields
+                }, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+            }
+            Column(Modifier.weight(1f)) {
+                Text(if (layer == null) "Select an element" else "${layerLabel(layer)} selected",
+                    style = MaterialTheme.typography.labelLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(when {
+                    layer == null -> "Tap an item on your card or choose a layer below."
+                    layer.locked -> "This layer is locked."
+                    layer is LayerModel.Text -> layer.text.replace('\n', ' ')
+                    else -> "Move, resize or remove this image."
+                }, style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            OutlinedButton(onClick = onDelete, enabled = layer != null && !layer.locked,
+                modifier = Modifier.height(48.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp)) {
+                Icon(Icons.Default.DeleteOutline, null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.size(6.dp))
+                Text("Delete", maxLines = 1)
+            }
+        }
+    }
+}
+
 @Composable
 fun CustomColorPickerDialog(
     initialHex: String,
@@ -398,8 +576,8 @@ fun CustomColorPickerDialog(
 ) {
     val initialColor = remember(initialHex) {
         try {
-            Color(android.graphics.Color.parseColor(initialHex))
-        } catch (e: Exception) {
+            Color(initialHex.toColorInt())
+        } catch (_: Exception) {
             Color.Red
         }
     }
@@ -451,11 +629,11 @@ fun CustomColorPickerDialog(
                         customHexInput = input
                         if (input.matches(Regex("^#([A-Fa-f0-9]{6})$"))) {
                             try {
-                                val parsed = android.graphics.Color.parseColor(input)
+                                val parsed = input.toColorInt()
                                 red = android.graphics.Color.red(parsed).toFloat()
                                 green = android.graphics.Color.green(parsed).toFloat()
                                 blue = android.graphics.Color.blue(parsed).toFloat()
-                            } catch (e: Exception) { }
+                            } catch (_: Exception) { }
                         }
                     },
                     label = { Text("Hex Code (e.g. #FF007F)") },
@@ -487,17 +665,23 @@ fun TextControlTab(
     onUpdateText: (String, String?, String?, Float?, String?) -> Unit,
     onReplaceWithAiWish: (String) -> Unit
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val aiWishGenerator = remember { AiWishGenerator() }
 
     var showAiDialog by remember { mutableStateOf(false) }
     var showColorPicker by remember { mutableStateOf(false) }
+    var aiOccasion by remember(project.title) {
+        val initial = if (project.title in listOf("Start from scratch", "Untitled Card", "AI Custom Card", "")) "Festive Celebration" else project.title
+        mutableStateOf(initial)
+    }
     var aiRecipient by remember { mutableStateOf("Friend") }
+    var aiTone by remember { mutableStateOf("Warm") }
     var aiLanguage by remember { mutableStateOf("English") }
     var isGeneratingAi by remember { mutableStateOf(false) }
 
-    val languages = listOf("English", "Hindi (हिंदी)", "Tamil (தமிழ்)", "German (Deutsch)", "Bengali (বাংলা)", "Arabic (العربية)")
+    val quickOccasions = listOf("Lakshmi Puja", "Diwali", "Birthday", "Wedding", "New Year", "Eid", "Good Morning")
+    val tones = listOf("Warm", "Devotional / Sacred", "Poetic", "Short & Playful", "Formal")
+    val languages = listOf("English", "Hindi (हिंदी)", "Bengali (বাংলা)", "Tamil (தமிழ்)", "German (Deutsch)", "Arabic (العربية)")
 
     val selectedLayer = (project.layers.find { it.id == selectedLayerId } as? LayerModel.Text)?.takeIf { it.fontId != "sticker" }
     val scrollState = rememberScrollState()
@@ -515,16 +699,50 @@ fun TextControlTab(
     if (showAiDialog) {
         AlertDialog(
             onDismissRequest = { showAiDialog = false },
-            title = { Text("Write a wish") },
+            title = { Text("✨ AI Wish Assistant") },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Tell us who it’s for. You can edit the message afterward.")
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text("Select topic, recipient, tone and language to write a customized wish.")
+
+                    OutlinedTextField(
+                        value = aiOccasion,
+                        onValueChange = { aiOccasion = it },
+                        label = { Text("Occasion / Topic") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        items(quickOccasions) { occ ->
+                            FilterChip(
+                                selected = aiOccasion.equals(occ, ignoreCase = true),
+                                onClick = { aiOccasion = occ },
+                                label = { Text(occ, fontSize = 11.sp) }
+                            )
+                        }
+                    }
+
                     OutlinedTextField(
                         value = aiRecipient,
                         onValueChange = { aiRecipient = it },
                         label = { Text("Recipient Name / Relation") },
-                        singleLine = true
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
                     )
+
+                    Text("Wish Tone", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium)
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        items(tones) { t ->
+                            FilterChip(
+                                selected = aiTone == t,
+                                onClick = { aiTone = t },
+                                label = { Text(t, fontSize = 11.sp) }
+                            )
+                        }
+                    }
 
                     Text("Wish Language", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium)
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -541,12 +759,16 @@ fun TextControlTab(
             confirmButton = {
                 Button(
                     enabled = !isGeneratingAi,
+                    colors = ButtonDefaults.buttonColors(containerColor = NeonAccent, contentColor = Color.Black),
                     onClick = {
                         isGeneratingAi = true
                         scope.launch {
+                            val finalOccasion = aiOccasion.ifBlank { "Festive Celebration" }
+                            val finalRecipient = aiRecipient.ifBlank { "Friend" }
                             val generated = aiWishGenerator.generateWish(
-                                festivalName = project.title,
-                                recipient = aiRecipient,
+                                festivalName = finalOccasion,
+                                recipient = finalRecipient,
+                                tone = aiTone,
                                 language = aiLanguage
                             )
                             onReplaceWithAiWish(generated)
@@ -555,6 +777,12 @@ fun TextControlTab(
                         }
                     }
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(if (isGeneratingAi) "Generating..." else "Generate Wish")
                 }
             },
@@ -572,19 +800,7 @@ fun TextControlTab(
             .verticalScroll(scrollState)
     ) {
         if (selectedLayer != null) {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text("Your message", fontWeight = FontWeight.Bold)
-                Button(
-                    onClick = { showAiDialog = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = NeonAccent, contentColor = Color.Black)
-                ) {
-                    Text("Help me write")
-                }
-            }
+            Text("Your message", fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -595,6 +811,26 @@ fun TextControlTab(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = false
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(
+                    onClick = { showAiDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = NeonAccent, contentColor = Color.Black)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Help me write")
+                }
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -665,7 +901,7 @@ fun TextControlTab(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(Color(android.graphics.Color.parseColor(hexColor)))
+                            .background(Color(hexColor.toColorInt()))
                             .border(1.dp, Color.Gray, CircleShape)
                             .clickable { onUpdateText(selectedLayer.text, hexColor, null, null, null) }
                     )
@@ -687,8 +923,7 @@ fun LayersControlTab(
     onUpdateImage: (String, TransformModel) -> Unit,
     onUpdateImageTint: (String, String) -> Unit,
     onUpdateImageOpacity: (String, Float) -> Unit,
-    onAddText: (String) -> Unit,
-    onDeleteLayer: () -> Unit
+    onAddText: (String) -> Unit
 ) {
     val tintSwatches = listOf(
         "#E5A93C", "#C41E3A", "#1E88E5", "#0F766E", "#5D4037",
@@ -752,7 +987,7 @@ fun LayersControlTab(
                     items(tintSwatches) { hex ->
                         val selected = selectedImage.tintColor.equals(hex, ignoreCase = true)
                         val swatch = try {
-                            Color(android.graphics.Color.parseColor(hex))
+                            Color(hex.toColorInt())
                         } catch (_: Exception) {
                             Color.Gray
                         }
@@ -774,7 +1009,6 @@ fun LayersControlTab(
 
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { onAddImage(selectedImage.assetPath) }) { Text("Duplicate image") }
-                TextButton(onClick = onDeleteLayer) { Text("Remove image") }
             }
         }
         DevotionalImagePicker(onAddImage)
@@ -815,13 +1049,7 @@ fun LayersControlTab(
             ) {
                 Text("➕ Add Text Layer", fontWeight = FontWeight.Bold)
             }
-            Button(
-                onClick = onDeleteLayer,
-                enabled = selectedLayerId != null,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-            ) {
-                Text("🗑️ Delete Selected")
-            }
+
         }
     }
 }
@@ -875,7 +1103,7 @@ private fun DevotionalImagePicker(onAddImage: (String) -> Unit) {
                             .background(
                                 if (artwork.tintable) {
                                     try {
-                                        Color(android.graphics.Color.parseColor(artwork.defaultTint)).copy(alpha = 0.18f)
+                                        Color(artwork.defaultTint.toColorInt()).copy(alpha = 0.18f)
                                     } catch (_: Exception) {
                                         MaterialTheme.colorScheme.surface
                                     }
@@ -891,7 +1119,7 @@ private fun DevotionalImagePicker(onAddImage: (String) -> Unit) {
                                 colorFilter = if (artwork.tintable) {
                                     androidx.compose.ui.graphics.ColorFilter.tint(
                                         try {
-                                            Color(android.graphics.Color.parseColor(artwork.defaultTint))
+                                            Color(artwork.defaultTint.toColorInt())
                                         } catch (_: Exception) {
                                             Marigold
                                         }
@@ -1020,7 +1248,7 @@ fun BackgroundControlTab(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(Color(android.graphics.Color.parseColor(hexColor)))
+                        .background(Color(hexColor.toColorInt()))
                         .border(1.5.dp, Color.LightGray, CircleShape)
                         .clickable { onSelectColor(hexColor) }
                 )
@@ -1082,7 +1310,6 @@ private fun DecorationControlTab(project: ProjectModel, selectedId: String?, vie
                 onValueChange = { viewModel.updateLayerTransform(sticker.id, sticker.transform.copy(rotation = it)) })
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { viewModel.addSticker(sticker.text) }) { Text("Duplicate") }
-                TextButton(onClick = viewModel::deleteSelectedLayer) { Text("Remove sticker") }
             }
         }
         Text("Ready-made looks", fontWeight = FontWeight.Bold)
@@ -1129,7 +1356,7 @@ private fun DecorationControlTab(project: ProjectModel, selectedId: String?, vie
         Text("Frame color", style = MaterialTheme.typography.labelMedium)
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             items(listOf("#E5A93C", "#FF9933", "#B91C1C", "#F472B6", "#A78BFA", "#34D399", "#FFFFFF", "#1B4332")) { hex ->
-                Box(Modifier.size(40.dp).clip(CircleShape).background(Color(android.graphics.Color.parseColor(hex)))
+                Box(Modifier.size(40.dp).clip(CircleShape).background(Color(hex.toColorInt()))
                     .border(if (project.canvas.borderColor == hex) 3.dp else 1.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
                     .clickable { viewModel.updateBorder(project.canvas.borderStyle, hex) })
             }

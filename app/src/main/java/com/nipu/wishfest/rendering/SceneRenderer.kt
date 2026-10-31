@@ -17,11 +17,21 @@ import com.nipu.wishfest.domain.models.ProjectModel
 import java.io.File
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.withSave
+import android.util.LruCache
+import java.util.concurrent.ConcurrentHashMap
 
 class SceneRenderer(private val context: Context) {
 
-    fun renderToBitmap(project: ProjectModel, targetWidth: Int, targetHeight: Int): Bitmap {
-        val bitmap = createBitmap(targetWidth, targetHeight)
+    private val imageBitmapCache = LruCache<String, Bitmap>(30)
+    private val typefaceCache = ConcurrentHashMap<String, Typeface>()
+
+    fun renderToBitmap(project: ProjectModel, targetWidth: Int, targetHeight: Int, reuseBitmap: Bitmap? = null): Bitmap {
+        val bitmap = if (reuseBitmap != null && reuseBitmap.width == targetWidth && reuseBitmap.height == targetHeight && !reuseBitmap.isRecycled) {
+            reuseBitmap.eraseColor(Color.TRANSPARENT)
+            reuseBitmap
+        } else {
+            createBitmap(targetWidth, targetHeight)
+        }
         val canvas = Canvas(bitmap)
 
         val scaleX = targetWidth.toFloat() / project.canvas.width.toFloat()
@@ -29,18 +39,12 @@ class SceneRenderer(private val context: Context) {
 
         renderCanvasBackground(canvas, project.canvas, targetWidth, targetHeight)
 
-        var lastTextBottomY = 0f
-
         for (layer in project.layers) {
             if (!layer.visible) continue
             canvas.withSave {
                 when (layer) {
                     is LayerModel.Text -> {
-                        if (layer.fontId == "sticker") {
-                            renderTextLayer(this, layer, scaleX, scaleY, 0f, project.canvas.backgroundColor)
-                        } else {
-                            lastTextBottomY = renderTextLayer(this, layer, scaleX, scaleY, lastTextBottomY, project.canvas.backgroundColor)
-                        }
+                        renderTextLayer(this, layer, scaleX, scaleY, project.canvas.backgroundColor)
                     }
                     is LayerModel.Image -> {
                         renderImageLayer(this, layer, scaleX, scaleY)
@@ -51,6 +55,81 @@ class SceneRenderer(private val context: Context) {
 
         renderBorder(canvas, project.canvas, targetWidth.toFloat(), targetHeight.toFloat())
         renderWatermark(canvas, targetWidth.toFloat(), targetHeight.toFloat())
+        return bitmap
+    }
+
+    fun renderBaseScene(
+        project: ProjectModel,
+        skipLayerId: String?,
+        targetWidth: Int,
+        targetHeight: Int,
+        reuseBitmap: Bitmap? = null
+    ): Bitmap {
+        val bitmap = if (reuseBitmap != null && reuseBitmap.width == targetWidth && reuseBitmap.height == targetHeight && !reuseBitmap.isRecycled) {
+            reuseBitmap.eraseColor(Color.TRANSPARENT)
+            reuseBitmap
+        } else {
+            createBitmap(targetWidth, targetHeight)
+        }
+        val canvas = Canvas(bitmap)
+
+        val scaleX = targetWidth.toFloat() / project.canvas.width.toFloat()
+        val scaleY = targetHeight.toFloat() / project.canvas.height.toFloat()
+
+        renderCanvasBackground(canvas, project.canvas, targetWidth, targetHeight)
+
+        for (layer in project.layers) {
+            if (!layer.visible || layer.id == skipLayerId) continue
+            canvas.withSave {
+                when (layer) {
+                    is LayerModel.Text -> {
+                        renderTextLayer(this, layer, scaleX, scaleY, project.canvas.backgroundColor)
+                    }
+                    is LayerModel.Image -> {
+                        renderImageLayer(this, layer, scaleX, scaleY)
+                    }
+                }
+            }
+        }
+
+        renderBorder(canvas, project.canvas, targetWidth.toFloat(), targetHeight.toFloat())
+        renderWatermark(canvas, targetWidth.toFloat(), targetHeight.toFloat())
+        return bitmap
+    }
+
+    fun renderLayerOntoBase(
+        baseBitmap: Bitmap,
+        project: ProjectModel,
+        layer: LayerModel,
+        targetWidth: Int,
+        targetHeight: Int,
+        reuseBitmap: Bitmap? = null
+    ): Bitmap {
+        val bitmap = if (reuseBitmap != null && reuseBitmap.width == targetWidth && reuseBitmap.height == targetHeight && !reuseBitmap.isRecycled) {
+            reuseBitmap.eraseColor(Color.TRANSPARENT)
+            reuseBitmap
+        } else {
+            createBitmap(targetWidth, targetHeight)
+        }
+        val canvas = Canvas(bitmap)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+        canvas.drawBitmap(baseBitmap, 0f, 0f, paint)
+
+        val scaleX = targetWidth.toFloat() / project.canvas.width.toFloat()
+        val scaleY = targetHeight.toFloat() / project.canvas.height.toFloat()
+
+        if (layer.visible) {
+            canvas.withSave {
+                when (layer) {
+                    is LayerModel.Text -> {
+                        renderTextLayer(this, layer, scaleX, scaleY, project.canvas.backgroundColor)
+                    }
+                    is LayerModel.Image -> {
+                        renderImageLayer(this, layer, scaleX, scaleY)
+                    }
+                }
+            }
+        }
         return bitmap
     }
 
@@ -261,14 +340,20 @@ class SceneRenderer(private val context: Context) {
             val green = Color.green(parseColor)
             val blue = Color.blue(parseColor)
             (red * 0.299 + green * 0.587 + blue * 0.114) > 180
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
 
     private fun renderCanvasBackground(canvas: Canvas, canvasModel: CanvasModel, targetWidth: Int, targetHeight: Int) {
-        if (canvasModel.backgroundPhotoPath.isNotEmpty() && File(canvasModel.backgroundPhotoPath).exists()) {
-            val bgBitmap = BitmapFactory.decodeFile(canvasModel.backgroundPhotoPath)
+        if (canvasModel.backgroundPhotoPath.isNotEmpty()) {
+            val path = canvasModel.backgroundPhotoPath
+            val bgBitmap = imageBitmapCache.get(path) ?: run {
+                val file = File(path)
+                if (file.exists()) {
+                    BitmapFactory.decodeFile(file.absolutePath)?.also { imageBitmapCache.put(path, it) }
+                } else null
+            }
             if (bgBitmap != null) {
                 val matrix = Matrix()
                 val srcWidth = bgBitmap.width.toFloat()
@@ -300,8 +385,8 @@ class SceneRenderer(private val context: Context) {
             if (canvasModel.backgroundColor.startsWith("gradient:")) {
                 val hexes = canvasModel.backgroundColor.removePrefix("gradient:").split(",")
                 if (hexes.size >= 2) {
-                    val c1 = try { Color.parseColor(hexes[0].trim()) } catch (e: Exception) { Color.RED }
-                    val c2 = try { Color.parseColor(hexes[1].trim()) } catch (e: Exception) { Color.YELLOW }
+                    val c1 = try { Color.parseColor(hexes[0].trim()) } catch (_: Exception) { Color.RED }
+                    val c2 = try { Color.parseColor(hexes[1].trim()) } catch (_: Exception) { Color.YELLOW }
                     shader = android.graphics.LinearGradient(
                         0f, 0f, targetWidth.toFloat(), targetHeight.toFloat(),
                         c1, c2,
@@ -326,7 +411,6 @@ class SceneRenderer(private val context: Context) {
         layer: LayerModel.Text,
         scaleX: Float,
         scaleY: Float,
-        previousTextBottomY: Float,
         backgroundColor: String
     ): Float {
         val originalPosY = layer.transform.y * scaleY
@@ -381,17 +465,21 @@ class SceneRenderer(private val context: Context) {
 
     private fun renderImageLayer(canvas: Canvas, layer: LayerModel.Image, scaleX: Float, scaleY: Float) {
         if (layer.assetPath.isEmpty()) return
-        val file = File(layer.assetPath)
-        val imgBitmap = if (file.exists()) {
-            BitmapFactory.decodeFile(file.absolutePath)
-        } else {
-            try {
-                context.assets.open(layer.assetPath).use {
-                    BitmapFactory.decodeStream(it)
+        val path = layer.assetPath
+        val imgBitmap = imageBitmapCache.get(path) ?: run {
+            val file = File(path)
+            val decoded = if (file.exists()) {
+                BitmapFactory.decodeFile(file.absolutePath)
+            } else {
+                try {
+                    context.assets.open(path).use {
+                        BitmapFactory.decodeStream(it)
+                    }
+                } catch (e: Exception) {
+                    null
                 }
-            } catch (e: Exception) {
-                null
             }
+            decoded?.also { imageBitmapCache.put(path, it) }
         } ?: return
 
         val posX = layer.transform.x * scaleX
@@ -420,7 +508,7 @@ class SceneRenderer(private val context: Context) {
             if (tint.startsWith("#") && tint.length >= 7) {
                 try {
                     colorFilter = android.graphics.PorterDuffColorFilter(
-                        android.graphics.Color.parseColor(tint),
+                        Color.parseColor(tint),
                         android.graphics.PorterDuff.Mode.SRC_IN
                     )
                 } catch (_: Exception) {
@@ -433,22 +521,25 @@ class SceneRenderer(private val context: Context) {
     }
 
     private fun getTypefaceForFontId(fontId: String): Typeface {
-        return try {
-            when (fontId.lowercase()) {
-                "bengali", "noto-sans-bengali" -> {
-                    Typeface.createFromAsset(context.assets, "fonts/NotoSansBengali-Regular.ttf")
+        val key = fontId.lowercase()
+        return typefaceCache.getOrPut(key) {
+            try {
+                when (key) {
+                    "bengali", "noto-sans-bengali" -> {
+                        Typeface.createFromAsset(context.assets, "fonts/NotoSansBengali-Regular.ttf")
+                    }
+                    "arabic", "noto-naskh-arabic" -> {
+                        Typeface.createFromAsset(context.assets, "fonts/NotoNaskhArabic-Regular.ttf")
+                    }
+                    "serif", "eligible" -> Typeface.SERIF
+                    "cursive", "calligraphy" -> Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC)
+                    "bold", "headline" -> Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD)
+                    "monospace", "retro" -> Typeface.MONOSPACE
+                    else -> Typeface.DEFAULT
                 }
-                "arabic", "noto-naskh-arabic" -> {
-                    Typeface.createFromAsset(context.assets, "fonts/NotoNaskhArabic-Regular.ttf")
-                }
-                "serif", "elegant" -> Typeface.SERIF
-                "cursive", "calligraphy" -> Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC)
-                "bold", "headline" -> Typeface.create(Typeface.DEFAULT_BOLD, Typeface.BOLD)
-                "monospace", "retro" -> Typeface.MONOSPACE
-                else -> Typeface.DEFAULT
+            } catch (e: Exception) {
+                Typeface.DEFAULT
             }
-        } catch (e: Exception) {
-            Typeface.DEFAULT
         }
     }
 }

@@ -124,7 +124,31 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         updateAndSaveProject(updatedProject)
     }
 
-    fun updateLayerTransform(layerId: String, newTransform: TransformModel) {
+    private var gestureStartProject: ProjectModel? = null
+
+    fun startGesture() {
+        if (gestureStartProject == null) {
+            gestureStartProject = _uiState.value.project
+        }
+    }
+
+    fun endGesture() {
+        val startState = gestureStartProject
+        gestureStartProject = null
+        val currentProject = _uiState.value.project ?: return
+        if (startState != null && startState != currentProject) {
+            undoStack.addLast(startState)
+            if (undoStack.size > 100) undoStack.removeFirst()
+            redoStack.clear()
+            _uiState.value = _uiState.value.copy(
+                canUndo = undoStack.isNotEmpty(),
+                canRedo = redoStack.isNotEmpty()
+            )
+        }
+        repository.saveProject(currentProject)
+    }
+
+    fun updateLayerTransform(layerId: String, newTransform: TransformModel, isTransient: Boolean = false) {
         val currentProject = _uiState.value.project ?: return
         val updatedLayers = currentProject.layers.map { layer ->
             if (layer.id == layerId) {
@@ -152,7 +176,11 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
             )
         }
 
-        updateAndSaveProject(updatedProject)
+        if (isTransient) {
+            _uiState.value = _uiState.value.copy(project = updatedProject)
+        } else {
+            updateAndSaveProject(updatedProject)
+        }
     }
 
     fun updateBackgroundColor(color: String) {
@@ -277,6 +305,8 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteSelectedLayer() {
         val currentProject = _uiState.value.project ?: return
         val layerId = _uiState.value.selectedLayerId ?: return
+        val layer = currentProject.layers.find { it.id == layerId } ?: return
+        if (layer.locked) return
 
         val updatedLayers = currentProject.layers.filter { it.id != layerId }
         val updatedProject = currentProject.copy(layers = updatedLayers, updatedAt = System.currentTimeMillis())
@@ -286,7 +316,8 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         updateAndSaveProject(updatedProject)
-        selectLayer(updatedLayers.firstOrNull()?.id)
+        // Avoid deleting another element if the user taps Delete twice.
+        selectLayer(null)
     }
 
     fun undo() {
@@ -318,7 +349,6 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     override fun onCleared() {
-        super.onCleared()
         if (nativeHandle != 0L) {
             NativeEngineBridge.nDestroyDocument(nativeHandle)
             nativeHandle = 0L

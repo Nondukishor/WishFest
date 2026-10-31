@@ -172,36 +172,89 @@ class AiWishGenerator(
     private fun fallbackWish(festivalName: String, recipient: String, tone: String, language: String): String {
         val festLower = festivalName.lowercase()
         val langLower = language.lowercase()
+        val toneLower = tone.lowercase()
 
+        val isShort = toneLower.contains("short") || toneLower.contains("playful")
+
+        // 1. Lakshmi Puja
         if (isLakshmiPuja(festivalName)) {
             return when {
                 langLower.contains("bengali") || langLower.contains("বাংলা") ->
-                    "শুভ লক্ষ্মী পূজা, প্রিয় $recipient! মা লক্ষ্মীর আশীর্বাদে আপনার ঘর সুখ, শান্তি ও সমৃদ্ধিতে ভরে উঠুক।"
+                    "শুভ লক্ষ্মী পূজা, প্রিয় $recipient! মা লক্ষ্মীর পরম আশীর্বাদে আপনার ঘর সুখ, শান্তি ও সমৃদ্ধিতে ভরে উঠুক।"
                 langLower.contains("hindi") || langLower.contains("हिंदी") ->
-                    "शुभ लक्ष्मी पूजा, प्रिय $recipient! माँ लक्ष्मी आपके घर में सुख, शांति और समृद्धि लाएं।"
+                    "शुभ लक्ष्मी पूजा, प्रिय $recipient! माँ लक्ष्मी की असीम कृपा से आपका घर सुख, शांति और समृद्धि से सदा महकता रहे।"
                 langLower.contains("tamil") || langLower.contains("தமிழ்") ->
                     "இனிய லட்சுமி பூஜை வாழ்த்துக்கள் $recipient! லட்சுமி தேவியின் அருளால் உங்கள் இல்லத்தில் மகிழ்ச்சியும் வளமும் பெருகட்டும்."
                 langLower.contains("german") || langLower.contains("deutsch") ->
-                    "Alles Gute zur Lakshmi Puja, $recipient! Möge Göttin Lakshmi dein Zuhause mit Frieden, Glück und Wohlstand segnen."
+                    "Herzliche Grüße zur Lakshmi Puja, $recipient! Möge Göttin Lakshmi dein Zuhause mit Frieden, Glück und Wohlstand segnen."
                 langLower.contains("arabic") || langLower.contains("عربية") ->
                     "أطيب التمنيات بمناسبة لاكشمي بوجا يا $recipient! أتمنى لك ولعائلتك السعادة والسلام والازدهار."
-                else -> "Happy Lakshmi Puja, dear $recipient! May Goddess Lakshmi bless your home with happiness, peace, and prosperity."
+                else -> "Happy Lakshmi Puja, dear $recipient! May Goddess Lakshmi bless your home with eternal happiness, peace, and prosperity."
             }
         }
 
+        // 2. Birthday
+        if (festLower.contains("birthday") || festLower.contains("bday") || festLower.contains("janam")) {
+            return when {
+                langLower.contains("hindi") || langLower.contains("हिंदी") ->
+                    "जन्मदिन की अनंत शुभकामनाएं प्रिय $recipient! ईश्वर आपको दीर्घायु, उत्तम स्वास्थ्य और जीवन में अपार सफलता प्रदान करें।"
+                langLower.contains("bengali") || langLower.contains("বাংলা") ->
+                    "শুভ জন্মদিন প্রিয় $recipient! জীবনের প্রতিটি পদক্ষেপে ভরে উঠুক অনাবিল আনন্দ, সুস্বাস্থ্য ও সাফল্য।"
+                langLower.contains("tamil") || langLower.contains("தமிழ்") ->
+                    "இனிய பிறந்தநாள் நல்வாழ்த்துக்கள் $recipient! உங்களின் அனைத்து கனவுகளும் மெய்ப்படட்டும்."
+                langLower.contains("german") || langLower.contains("deutsch") ->
+                    "Herzlichen Glückwunsch zum Geburtstag, lieber $recipient! Möge das neue Lebensjahr voller Freude, Gesundheit und Erfolg sein."
+                langLower.contains("arabic") || langLower.contains("عربية") ->
+                    "عيد ميلاد سعيد يا $recipient! أتمنى لك سنة جديدة مليئة بالسعادة والنجاح والأنباء السارة."
+                else -> if (isShort) "Happy Birthday, $recipient! 🎉 Wishing you a magnificent day filled with joy and laughter!"
+                        else "Happy Birthday to my dear $recipient! May the year ahead bring you good health, immense happiness, and great success!"
+            }
+        }
+
+        // 3. Wedding / Anniversary
+        if (festLower.contains("anniversary") || festLower.contains("wedding") || festLower.contains("marriage")) {
+            return when {
+                langLower.contains("hindi") || langLower.contains("हिंदी") ->
+                    "शादी की सालगिरह की हार्दिक बधाई प्रिय $recipient! आपका यह खूबसूरत बंधन हमेशा प्रेम, विश्वास और खुशियों से महकता रहे।"
+                langLower.contains("bengali") || langLower.contains("বাংলা") ->
+                    "বিবাহ বার্ষিকীর আন্তরিক শুভেচ্ছা প্রিয় $recipient! তোমাদের জীবন চিরকাল ভালোবাসা ও সুখে পরিপূর্ণ থাকুক।"
+                langLower.contains("tamil") || langLower.contains("தமிழ்") ->
+                    "இனிய திருமண நாள் வாழ்த்துக்கள் $recipient! உங்களின் அன்பும் மகிழ்ச்சியும் என்றென்றும் தொடரட்டும்."
+                langLower.contains("german") || langLower.contains("deutsch") ->
+                    "Alles Gute zum Jahrestag, lieber $recipient! Ich wünsche euch weiterhin von Herzen viel Liebe und gemeinsame Glücksmomente."
+                langLower.contains("arabic") || langLower.contains("عربية") ->
+                    "ذكرى زواج سعيدة يا $recipient! أتمنى لكما حياة مليئة بالحب والسعادة والبركة الدائمة."
+                else -> "Happy Anniversary, dear $recipient! Wishing you a lifetime of unbounded love, laughter, and cherished memories together."
+            }
+        }
+
+        // 4. Good Morning
+        if (festLower.contains("morning") || festLower.contains("suprabhat")) {
+            return when {
+                langLower.contains("hindi") || langLower.contains("हिंदी") ->
+                    "शुभ प्रभात प्रिय $recipient! आपका आज का दिन नई ऊर्जा, सकारात्मकता और ढेर सारी सफलताओं से भरा हो।"
+                langLower.contains("bengali") || langLower.contains("বাংলা") ->
+                    "শুভ সকাল প্রিয় $recipient! নতুন এই চমৎকার দিনটি আপনার জীবনে নিয়ে আসুক অনাবিল শান্তি ও আনন্দ।"
+                langLower.contains("tamil") || langLower.contains("தமிழ்") ->
+                    "இனிய காலை வணக்கம் $recipient! இன்றைய நாள் உங்களுக்கு அமைதியையும் புதிய வாய்ப்புகளையும் தரட்டும்."
+                else -> "Good Morning, dear $recipient! May your day be blessed with bright moments, peace, and inspiring opportunities."
+            }
+        }
+
+        // 5. General Language-based Greetings
         return when {
             langLower.contains("hindi") || langLower.contains("हिंदी") -> {
                 when {
                     festLower.contains("durga") || festLower.contains("bijoya") ->
-                        "दुर्गा पूजा एवं विजयादशमी की हार्दिक शुभकामनाएं प्रिय $recipient! माता रानी आपके जीवन में सुख और शांति लाएं।"
+                        "दुर्गा पूजा एवं विजयादशमी की हार्दिक शुभकामनाएं प्रिय $recipient! माता रानी आपके जीवन में सुख, शांति और समृद्धि लाएं।"
                     festLower.contains("diwali") || festLower.contains("deepavali") ->
-                        "दीपावली की हार्दिक शुभकामनाएं $recipient! दीपों का यह पर्व आपके जीवन में प्रकाश और समृद्धि भर दे।"
+                        "दीपावली की हार्दिक शुभकामनाएं प्रिय $recipient! दीपों का यह पावन पर्व आपके जीवन को सुख और प्रकाश से रोशन कर दे।"
                     festLower.contains("eid") ->
-                        "ईद मुबारक $recipient! अल्लाह आपके जीवन में खुशियां, शांति और बरकत अता फरमाए।"
+                        "ईद मुबारक $recipient! अल्लाह ताला आपके जीवन में अनगिनत खुशियां, शांति और बरकत अता फरमाए।"
                     isNewYear(festivalName) ->
-                        "नव वर्ष 2026 की हार्दिक शुभकामनाएं प्रिय $recipient! नया साल आपके लिए सुख, समृद्धि और अच्छी सेहत लाए।"
+                        "नव वर्ष की हार्दिक शुभकामनाएं प्रिय $recipient! नया साल आपके जीवन में नई उमंग और उत्तम स्वास्थ्य लाए।"
                     else ->
-                        "आपको और आपके परिवार को $festivalName की हार्दिक शुभकामनाएं प्रिय $recipient!"
+                        "आपको और आपके पूरे परिवार को $festivalName की हार्दिक शुभकामनाएं प्रिय $recipient!"
                 }
             }
             langLower.contains("tamil") || langLower.contains("தமிழ்") -> {
@@ -219,17 +272,17 @@ class AiWishGenerator(
             langLower.contains("german") || langLower.contains("deutsch") -> {
                 when {
                     isNewYear(festivalName) ->
-                        "Frohes neues Jahr 2026, lieber $recipient! Möge das neue Jahr dir Gesundheit, Glück und viel Erfolg bringen."
+                        "Frohes neues Jahr, lieber $recipient! Möge das neue Jahr dir Gesundheit, Glück und viel Erfolg bringen."
                     festLower.contains("sunday") ->
                         "Einen gesegneten und friedvollen Sonntag, lieber $recipient! Genieße diesen wunderschönen Tag."
                     else ->
-                        "Herzliche Grüße zum $festivalName, lieber $recipient! Ich wünsche dir und deiner Familie Freude und viel Segen."
+                        "Herzliche Grüße zum $festivalName, lieber $recipient! Ich wünsche dir und deiner Familie viel Freude und Segen."
                 }
             }
             langLower.contains("bengali") || langLower.contains("বাংলা") -> {
                 when {
                     festLower.contains("durga") || festLower.contains("bijoya") ->
-                        "শুভ বিজয়ার প্রীতি ও আন্তরিক শুভেচ্ছা প্রিয় $recipient! মা দুর্গার আশীর্ষে তোমার জীবন আনন্দে ভরে উঠুক।"
+                        "শুভ বিজয়ার প্রীতি ও আন্তরিক শুভেচ্ছা প্রিয় $recipient! মা দুর্গার আশীর্বাদে তোমার জীবন সুখে ও শান্তিতে ভরে উঠুক।"
                     festLower.contains("eid") ->
                         "পবিত্র ঈদুল ফিতরের হার্দিক শুভেচ্ছা প্রিয় $recipient! ঈদ মোবারক।"
                     isNewYear(festivalName) || festLower.contains("boishakh") ->
@@ -248,17 +301,17 @@ class AiWishGenerator(
             else -> {
                 when {
                     festLower.contains("durga") || festLower.contains("bijoya") ->
-                        "Warm Durga Puja and Subho Bijoya wishes, dear $recipient! May Maa Durga bless your home with health, peace, and joy."
+                        "Warm Durga Puja and Subho Bijoya wishes, dear $recipient! May Goddess Durga bless your home with health, peace, and happiness."
                     festLower.contains("eid") ->
                         "Eid Mubarak to my dear $recipient! May this sacred occasion bring peace, prosperity, and endless blessings."
                     festLower.contains("diwali") || festLower.contains("deepavali") ->
-                        "Happy Diwali & Deepavali dear $recipient! May the light of diyas fill your life with warmth and happiness."
+                        "Happy Diwali, dear $recipient! May the divine light of diyas fill your life with warmth, joy, and prosperity."
                     isNewYear(festivalName) ->
-                        "Happy New Year 2026, dear $recipient! May the year ahead be filled with new hope, good health, and success."
+                        "Happy New Year, dear $recipient! May the year ahead be filled with new hope, good health, and abundant success."
                     festLower.contains("sunday") ->
                         "Wishing you a peaceful and blessed Sunday, dear $recipient! Enjoy a relaxing day."
                     else ->
-                        "Wishing you a magnificent and blessed $festivalName, dear $recipient! May happiness surround you always."
+                        "Wishing you a magnificent and blessed $festivalName, dear $recipient! May happiness and peace surround you always."
                 }
             }
         }

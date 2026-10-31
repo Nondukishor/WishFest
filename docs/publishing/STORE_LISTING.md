@@ -33,5 +33,8 @@ Privacy policy: publish docs/privacy_policy.html at your own publicly accessible
 
 Suggested category: Art & Design. Confirm category, pricing, countries, audience and content-rating answers in Play Console.
 
-Release notes (1.0):
-Create and personalize greeting cards with festive templates, emoji stickers, decorative frames, offline wishes, optional on-device AI, and easy image sharing.
+Release notes (1.1 / 1.0.2):
+• Ultra-smooth 120 FPS canvas editing with zero layer or frame jittering.
+• Enhanced AI Wish Assistant with custom topic input, recipient name, and tone presets (Warm, Devotional, Poetic, Playful, Formal) across 6 languages.
+• Instant layer selection on tap and improved touch gesture precision.
+• Upgraded core libraries and Jetpack Compose 1.12.1 for maximum performance and stability.
